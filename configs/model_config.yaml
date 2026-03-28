@@ -1,0 +1,54 @@
+# Model architecture configuration for CardioSense
+
+baseline_cnn:
+  name: BaselineCNN
+  input_shape: [187, 1]
+  num_classes: 5
+  layers:
+    - {type: Conv1D, filters: 32, kernel: 7, activation: relu}
+    - {type: BatchNorm}
+    - {type: MaxPool1D, size: 2}
+    - {type: Conv1D, filters: 64, kernel: 5, activation: relu}
+    - {type: BatchNorm}
+    - {type: MaxPool1D, size: 2}
+    - {type: Conv1D, filters: 128, kernel: 3, activation: relu}
+    - {type: BatchNorm}
+    - {type: GlobalAvgPool}
+    - {type: Dense, units: 64, activation: relu}
+    - {type: Dropout, rate: 0.3}
+    - {type: Dense, units: 5, activation: softmax}
+  purpose: Baseline — establishes first optimizer comparison data point
+
+resnet1d:
+  name: ResNet1D
+  input_shape: [187, 1]
+  num_classes: 5
+  initial_conv:
+    filters: 32
+    kernel: 7
+    padding: same
+
+  residual_blocks:
+    # Block group 1: low-level morphology features (P-wave, QRS, T-wave shape)
+    - {filters: 32, stride: 1, num_blocks: 2}
+    # Block group 2: mid-level temporal patterns (downsampling)
+    - {filters: 64, stride: 2, num_blocks: 2}
+    # Block group 3: high-level arrhythmia patterns (downsampling)
+    - {filters: 128, stride: 2, num_blocks: 2}
+
+  head:
+    pooling: global_average   # temporal invariance to beat alignment
+    dense_units: 128
+    dropout: 0.4
+    output_units: 5
+    activation: softmax
+
+  approx_params: 1_200_000   # ~1.2M parameters
+  gradcam_target: layer3      # final 128-filter residual block group
+
+  residual_block:
+    kernel_size: 7
+    architecture: "Conv1D → BatchNorm → ReLU → Conv1D → BatchNorm → (+skip) → ReLU"
+    skip_connection:
+      same_dim: identity
+      diff_dim: conv1x1_projection   # used when stride>1 or channels change
