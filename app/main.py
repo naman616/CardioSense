@@ -77,11 +77,18 @@ def main():
     new_signal = upload_panel()
 
     if new_signal is not None:
-        # New signal loaded — store and clear downstream caches
+        # Only clear caches when the signal genuinely changes.
+        # The file uploader re-returns the same signal on every rerun (e.g. after
+        # st.rerun() following Grad-CAM computation), so comparing hashes prevents
+        # accidentally wiping a freshly computed heatmap.
+        current = st.session_state.ecg_signal
+        current_hash = hash(current.tobytes()) if current is not None else None
+        new_hash = hash(new_signal.tobytes())
+        if new_hash != current_hash:
+            st.session_state.pop("predictions", None)
+            st.session_state.pop("gradcam_signal_hash", None)
+            st.session_state.pop("gradcam_fig", None)
         st.session_state.ecg_signal = new_signal
-        st.session_state.pop("predictions", None)
-        st.session_state.pop("gradcam_signal_hash", None)
-        st.session_state.pop("gradcam_fig", None)
 
     ecg_signal = st.session_state.ecg_signal
 
