@@ -35,7 +35,13 @@ def load_mitbih(
     Returns:
         X_train, y_train, X_test, y_test
     """
-    raise NotImplementedError
+    df_train = pd.read_csv(train_path, header=None)
+    df_test = pd.read_csv(test_path, header=None)
+    X_train = df_train.iloc[:, :187].values.astype(np.float32)
+    y_train = df_train.iloc[:, 187].values.astype(int)
+    X_test = df_test.iloc[:, :187].values.astype(np.float32)
+    y_test = df_test.iloc[:, 187].values.astype(int)
+    return X_train, y_train, X_test, y_test
 
 
 def load_ptbdb(
@@ -47,4 +53,13 @@ def load_ptbdb(
     Returns:
         X, y
     """
-    raise NotImplementedError
+    df_normal = pd.read_csv(normal_path, header=None)
+    df_abnormal = pd.read_csv(abnormal_path, header=None)
+    df_normal = df_normal.iloc[:, :187]
+    df_normal["label"] = 0
+    df_abnormal = df_abnormal.iloc[:, :187]
+    df_abnormal["label"] = 1
+    df = pd.concat([df_normal, df_abnormal], ignore_index=True)
+    X = df.iloc[:, :187].values.astype(np.float32)
+    y = df.iloc[:, 187].values.astype(int)
+    return X, y

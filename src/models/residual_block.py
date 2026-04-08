@@ -23,6 +23,7 @@ Design Notes:
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class ResidualBlock(nn.Module):
@@ -37,7 +38,33 @@ class ResidualBlock(nn.Module):
         dropout: float = 0.0,
     ):
         super().__init__()
-        raise NotImplementedError
+        pad = kernel_size // 2
+
+        self.conv1 = nn.Conv1d(
+            in_channels, out_channels, kernel_size,
+            stride=stride, padding=pad, bias=False,
+        )
+        self.bn1 = nn.BatchNorm1d(out_channels)
+
+        self.conv2 = nn.Conv1d(
+            out_channels, out_channels, kernel_size,
+            stride=1, padding=pad, bias=False,
+        )
+        self.bn2 = nn.BatchNorm1d(out_channels)
+
+        self.dropout = nn.Dropout(dropout) if dropout > 0.0 else nn.Identity()
+
+        # Skip connection: projection if dimensions change, identity otherwise
+        if stride != 1 or in_channels != out_channels:
+            self.skip = nn.Sequential(
+                nn.Conv1d(in_channels, out_channels, 1, stride=stride, bias=False),
+                nn.BatchNorm1d(out_channels),
+            )
+        else:
+            self.skip = nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.dropout(out)
+        out = self.bn2(self.conv2(out))
+        return F.relu(out + self.skip(x))

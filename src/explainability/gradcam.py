@@ -32,6 +32,7 @@ Design Notes:
 import torch
 import torch.nn as nn
 import numpy as np
+from captum.attr import LayerGradCam
 
 
 class GradCAM1D:
@@ -44,7 +45,9 @@ class GradCAM1D:
             target_layer: The convolutional layer to compute CAM from.
                           Should be model.get_gradcam_target_layer().
         """
-        raise NotImplementedError
+        self.model = model
+        self.model.eval()
+        self.gradcam = LayerGradCam(model, target_layer)
 
     def compute(
         self,
@@ -54,14 +57,32 @@ class GradCAM1D:
         """Compute Grad-CAM heatmap for a single ECG sample.
 
         Args:
-            x: Input tensor of shape (1, 187, 1).
+            x: Input tensor of shape (1, 1, 187) — (batch=1, channels=1, length=187).
             target_class: Class index to explain. If None, uses predicted class.
 
         Returns:
             heatmap: 1D array of shape (187,), values in [0, 1].
         """
-        raise NotImplementedError
+        if target_class is None:
+            with torch.no_grad():
+                target_class = int(self.model(x).argmax(1).item())
+
+        # LayerGradCam returns attributions for the target layer
+        attr = self.gradcam.attribute(x, target=target_class)  # (1, C, L')
+        # Average over channels, apply ReLU
+        cam = attr.squeeze(0).mean(0).relu().detach().cpu().numpy()  # (L',)
+        return self._upsample_cam(cam)
 
     def _upsample_cam(self, cam: np.ndarray, target_length: int = 187) -> np.ndarray:
         """Upsample CAM from feature map size back to input signal length."""
-        raise NotImplementedError
+        if len(cam) == 0:
+            return np.zeros(target_length)
+        upsampled = np.interp(
+            np.linspace(0, len(cam) - 1, target_length),
+            np.arange(len(cam)),
+            cam,
+        )
+        max_val = upsampled.max()
+        if max_val > 0:
+            upsampled = upsampled / max_val
+        return upsampled  # (187,) in [0, 1]

@@ -37,25 +37,35 @@ Design Notes:
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+from src.data.splitter import split_train_val
+
 
 def normalize(X: np.ndarray) -> np.ndarray:
     """Per-sample Z-score normalization."""
-    raise NotImplementedError
+    mean = X.mean(axis=1, keepdims=True)
+    std = X.std(axis=1, keepdims=True).clip(min=1e-8)
+    return (X - mean) / std
 
 
 def remove_outliers(X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """IQR-based outlier removal on signal amplitude range."""
-    raise NotImplementedError
+    amp_range = X.max(axis=1) - X.min(axis=1)
+    q1, q3 = np.percentile(amp_range, [25, 75])
+    iqr = q3 - q1
+    mask = (amp_range >= q1 - 1.5 * iqr) & (amp_range <= q3 + 1.5 * iqr)
+    return X[mask], y[mask]
 
 
 def apply_smote(X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """SMOTE oversampling to balance all 5 arrhythmia classes."""
-    raise NotImplementedError
+    from imblearn.over_sampling import SMOTE
+    sm = SMOTE(random_state=42)
+    return sm.fit_resample(X, y)
 
 
 def reshape_for_conv1d(X: np.ndarray) -> np.ndarray:
     """Reshape (N, 187) -> (N, 187, 1) for PyTorch Conv1d input."""
-    raise NotImplementedError
+    return X.reshape(X.shape[0], X.shape[1], 1)
 
 
 def preprocess(
@@ -71,4 +81,23 @@ def preprocess(
         X_train, y_train, X_val, y_val, X_test, y_test
         (all as numpy arrays with final shape (N, 187, 1))
     """
-    raise NotImplementedError
+    # Step 5: Split train → train + val BEFORE any augmentation
+    X_tr, X_val, y_tr, y_val = split_train_val(X_train, y_train, val_fraction)
+
+    # Step 2: IQR outlier removal (train only)
+    X_tr, y_tr = remove_outliers(X_tr, y_tr)
+
+    # Step 1: Z-score normalize (per-sample, so no leakage across splits)
+    X_tr = normalize(X_tr)
+    X_val = normalize(X_val)
+    X_test = normalize(X_test)
+
+    # Step 3: SMOTE (train only)
+    X_tr, y_tr = apply_smote(X_tr, y_tr)
+
+    # Step 4: Reshape to (N, 187, 1)
+    return dict(
+        X_train=reshape_for_conv1d(X_tr), y_train=y_tr,
+        X_val=reshape_for_conv1d(X_val),  y_val=y_val,
+        X_test=reshape_for_conv1d(X_test), y_test=y_test,
+    )

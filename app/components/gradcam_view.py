@@ -27,6 +27,16 @@ import torch.nn as nn
 import streamlit as st
 
 
+# Expected high-attention region per class
+CLASS_ATTENTION_NOTES = {
+    0: "Normal beats: Grad-CAM typically attends to P-wave and QRS transition regions.",
+    1: "Supraventricular (S): High attention expected at P-wave (~samples 10-30) — abnormal P morphology.",
+    2: "Ventricular (V): High attention expected at wide QRS complex (~samples 50-80).",
+    3: "Fusion (F): Mixed attention across P-wave and QRS — hybrid normal+ectopic morphology.",
+    4: "Unknown (Q): Diffuse attention pattern — morphology doesn't fit standard categories.",
+}
+
+
 def gradcam_panel(
     model: nn.Module,
     ecg_signal: np.ndarray,
@@ -39,4 +49,45 @@ def gradcam_panel(
         ecg_signal: Raw ECG values, shape (187,).
         predictions: Output from run_inference() with 'class_idx' key.
     """
-    raise NotImplementedError
+    from src.explainability.gradcam import GradCAM1D
+    from src.explainability.heatmap_overlay import overlay_heatmap
+    from src.data.preprocessor import normalize
+
+    st.subheader("Model Explainability — Grad-CAM")
+    st.markdown(
+        "Grad-CAM shows **which parts of the ECG signal the model attended to** "
+        "when making its prediction. Red = high attention, Blue = low attention."
+    )
+
+    if st.button("Compute Grad-CAM Heatmap"):
+        with st.spinner("Computing Grad-CAM..."):
+            try:
+                cls_idx = predictions["class_idx"]
+                confidence = predictions["confidence"]
+
+                # Preprocess for model input
+                x = normalize(ecg_signal.reshape(1, -1))          # (1, 187)
+                x_tensor = torch.tensor(x, dtype=torch.float32).unsqueeze(0)  # (1, 1, 187)
+                device = next(model.parameters()).device
+                x_tensor = x_tensor.to(device)
+
+                # Compute Grad-CAM
+                gradcam = GradCAM1D(model, model.get_gradcam_target_layer())
+                heatmap = gradcam.compute(x_tensor, target_class=cls_idx)
+
+                # Overlay on original (raw) signal
+                fig = overlay_heatmap(
+                    ecg_signal=ecg_signal,
+                    heatmap=heatmap,
+                    predicted_class=cls_idx,
+                    true_class=cls_idx,  # true class unknown at inference time
+                    confidence=confidence,
+                )
+                st.pyplot(fig)
+
+                # Clinical interpretation note
+                note = CLASS_ATTENTION_NOTES.get(cls_idx, "")
+                st.info(f"**Expected attention pattern:** {note}")
+
+            except Exception as e:
+                st.error(f"Grad-CAM computation failed: {e}")

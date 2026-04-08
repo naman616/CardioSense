@@ -35,13 +35,40 @@ class BaselineCNN(nn.Module):
 
     def __init__(self, num_classes: int = 5, dropout: float = 0.3):
         super().__init__()
-        raise NotImplementedError
+
+        self.features = nn.Sequential(
+            # Block 1
+            nn.Conv1d(1, 32, kernel_size=7, padding=3, bias=False),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
+            nn.MaxPool1d(2),
+            # Block 2
+            nn.Conv1d(32, 64, kernel_size=5, padding=2, bias=False),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.MaxPool1d(2),
+            # Block 3
+            nn.Conv1d(64, 128, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+        )
+        self.pool = nn.AdaptiveAvgPool1d(1)  # Global Average Pooling
+
+        self.head = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(64, num_classes),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x: Tensor of shape (batch, 187, 1)
+            x: Tensor of shape (batch, 1, 187)
         Returns:
-            logits: Tensor of shape (batch, 5)
+            logits: Raw class scores, shape (batch, num_classes).
+                    Apply softmax externally when probabilities are needed.
         """
-        raise NotImplementedError
+        x = self.features(x)
+        x = self.pool(x).squeeze(-1)  # (batch, 128)
+        return self.head(x)

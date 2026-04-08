@@ -1,0 +1,25 @@
+======================================================================
+CardioSense — Model Evaluation Report
+1D ResNet + Adam Optimizer (Kingma & Ba, ICLR 2015)
+======================================================================
+
+── Overall Metrics ──────────────────────────────────────────
+  Accuracy      : 0.9820  (target ≥ 0.98)
+  Macro F1      : 0.9140  (target ≥ 0.93)
+  Weighted F1   : 0.9823
+  Mean ROC-AUC  : 0.9892
+
+── Per-Class Metrics ────────────────────────────────────────
+                      Precision  Recall      F1  ROC-AUC
+Class                                                   
+Normal (N)               0.9931  0.9879  0.9905   0.9946
+Supraventricular (S)     0.7774  0.8417  0.8083   0.9748
+Ventricular (V)          0.9447  0.9675  0.9560   0.9936
+Fusion (F)               0.8023  0.8519  0.8263   0.9837
+Unknown (Q)              0.9876  0.9907  0.9891   0.9991
+
+── References ───────────────────────────────────────────────
+  Kingma & Ba (2015). Adam: A Method for Stochastic Optimization.
+  Lin et al. (2017). Focal Loss for Dense Object Detection.
+  He et al. (2016). Deep Residual Learning for Image Recognition.
+======================================================================

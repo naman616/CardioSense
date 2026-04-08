@@ -35,9 +35,16 @@ Design Notes:
     - tqdm progress bar per epoch shows live loss and F1.
 """
 
+import time
+from collections import defaultdict
+
 import torch
 import torch.nn as nn
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
+from sklearn.metrics import f1_score, accuracy_score
+from tqdm import tqdm
+
 from .focal_loss import FocalLoss
 from .callbacks import EarlyStopping, ModelCheckpoint
 
@@ -55,7 +62,15 @@ class Trainer:
         use_lr_scheduler: bool = True,
         max_epochs: int = 100,
     ):
-        raise NotImplementedError
+        self.model = model.to(device)
+        self.optimizer = optimizer
+        self.loss_fn = loss_fn.to(device)
+        self.device = device
+        self.callbacks = callbacks or []
+        self.max_epochs = max_epochs
+        self.scheduler = (
+            CosineAnnealingLR(optimizer, T_max=max_epochs) if use_lr_scheduler else None
+        )
 
     def fit(
         self,
@@ -68,16 +83,95 @@ class Trainer:
             history: dict with keys train_loss, val_loss, train_f1, val_f1,
                      train_acc, val_acc, lr — each a list of per-epoch values.
         """
-        raise NotImplementedError
+        history = defaultdict(list)
+
+        for epoch in range(1, self.max_epochs + 1):
+            t0 = time.time()
+            train_m = self._train_epoch(train_loader)
+            val_m = self._val_epoch(val_loader)
+            elapsed = time.time() - t0
+
+            # Log the LR used this epoch BEFORE the scheduler updates it
+            history["lr"].append(self.optimizer.param_groups[0]["lr"])
+
+            if self.scheduler is not None:
+                self.scheduler.step()
+
+            # Log metrics
+            for k, v in train_m.items():
+                history[f"train_{k}"].append(v)
+            for k, v in val_m.items():
+                history[f"val_{k}"].append(v)
+            history["epoch_time"].append(elapsed)
+
+            print(
+                f"Epoch {epoch:3d}/{self.max_epochs} | "
+                f"loss {train_m['loss']:.4f}/{val_m['loss']:.4f} | "
+                f"f1 {train_m['f1']:.4f}/{val_m['f1']:.4f} | "
+                f"{elapsed:.1f}s"
+            )
+
+            # Run callbacks
+            val_f1 = val_m["f1"]
+            should_stop = False
+            for cb in self.callbacks:
+                if isinstance(cb, EarlyStopping):
+                    if cb(val_f1, self.model):
+                        should_stop = True
+                elif isinstance(cb, ModelCheckpoint):
+                    cb(epoch, val_f1, self.model)
+
+            if should_stop:
+                print(f"Early stopping at epoch {epoch}.")
+                for cb in self.callbacks:
+                    if isinstance(cb, EarlyStopping):
+                        cb.restore_best_weights(self.model)
+                break
+
+        return dict(history)
 
     def _train_epoch(self, loader: DataLoader) -> dict:
         """One training epoch. Returns dict of train metrics."""
-        raise NotImplementedError
+        self.model.train()
+        total_loss = 0.0
+        all_preds, all_targets = [], []
+
+        for X, y in tqdm(loader, desc="  train", leave=False):
+            X, y = X.to(self.device), y.to(self.device)
+            self.optimizer.zero_grad()
+            logits = self.model(X)
+            loss = self.loss_fn(logits, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+            self.optimizer.step()
+
+            total_loss += loss.item()
+            all_preds.extend(logits.argmax(1).cpu().numpy())
+            all_targets.extend(y.cpu().numpy())
+
+        f1 = f1_score(all_targets, all_preds, average="macro", zero_division=0)
+        acc = accuracy_score(all_targets, all_preds)
+        return {"loss": total_loss / len(loader), "f1": f1, "acc": acc}
 
     def _val_epoch(self, loader: DataLoader) -> dict:
         """One validation epoch. Returns dict of val metrics."""
-        raise NotImplementedError
+        self.model.eval()
+        total_loss = 0.0
+        all_preds, all_targets = [], []
+
+        with torch.no_grad():
+            for X, y in loader:
+                X, y = X.to(self.device), y.to(self.device)
+                logits = self.model(X)
+                loss = self.loss_fn(logits, y)
+                total_loss += loss.item()
+                all_preds.extend(logits.argmax(1).cpu().numpy())
+                all_targets.extend(y.cpu().numpy())
+
+        f1 = f1_score(all_targets, all_preds, average="macro", zero_division=0)
+        acc = accuracy_score(all_targets, all_preds)
+        return {"loss": total_loss / len(loader), "f1": f1, "acc": acc}
 
     def evaluate(self, test_loader: DataLoader) -> dict:
         """Final evaluation on test set. Returns dict of test metrics."""
-        raise NotImplementedError
+        return self._val_epoch(test_loader)

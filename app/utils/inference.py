@@ -44,7 +44,18 @@ def load_model(
     Returns:
         model: ResNet1D in eval mode on the specified device.
     """
-    raise NotImplementedError
+    from src.models.resnet1d import ResNet1D
+    from src.utils.device import get_device
+
+    if device is None:
+        device = get_device(verbose=False)
+
+    model = ResNet1D()
+    state_dict = torch.load(checkpoint_path, map_location=device, weights_only=True)
+    model.load_state_dict(state_dict)
+    model.to(device)
+    model.eval()
+    return model
 
 
 def run_inference(model: nn.Module, ecg_signal: np.ndarray) -> dict:
@@ -61,4 +72,25 @@ def run_inference(model: nn.Module, ecg_signal: np.ndarray) -> dict:
             'confidence'   : float (max softmax probability)
             'probabilities': np.ndarray shape (5,)
     """
-    raise NotImplementedError
+    from src.data.preprocessor import normalize
+
+    # Z-score normalization (per-sample, same as training)
+    x = normalize(ecg_signal.reshape(1, -1))        # (1, 187)
+
+    # Reshape to (1, 1, 187) for Conv1d: (batch, channels, length)
+    x_tensor = torch.tensor(x, dtype=torch.float32).unsqueeze(0)  # (1, 1, 187)
+
+    device = next(model.parameters()).device
+    x_tensor = x_tensor.to(device)
+
+    with torch.no_grad():
+        logits = model(x_tensor)
+        probs = torch.softmax(logits, dim=1).squeeze().cpu().numpy()  # (5,)
+
+    idx = int(probs.argmax())
+    return {
+        "class_idx":    idx,
+        "class_name":   CLASS_NAMES[idx],
+        "confidence":   float(probs[idx]),
+        "probabilities": probs,
+    }

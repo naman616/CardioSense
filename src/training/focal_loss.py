@@ -49,17 +49,42 @@ class FocalLoss(nn.Module):
                                If None, uniform weights (standard focal loss).
         """
         super().__init__()
-        raise NotImplementedError
+        self.gamma = gamma
+
+        if class_frequencies is not None:
+            # α_t = 1 / freq, then normalize so weights sum to num_classes
+            alpha = 1.0 / np.clip(class_frequencies, 1e-6, None)
+            alpha = (alpha / alpha.sum() * len(alpha)).astype(np.float32)
+            self.register_buffer("alpha", torch.tensor(alpha, dtype=torch.float32))
+        else:
+            self.alpha = None
 
     def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            logits: Raw model outputs, shape (batch, num_classes)
+            logits: Raw class scores from model (before softmax), shape (batch, num_classes)
             targets: Integer class labels, shape (batch,)
         Returns:
             Scalar focal loss (mean over batch)
         """
-        raise NotImplementedError
+        # Numerically stable log-probabilities via log_softmax (avoids softmax→log chain)
+        log_probs = F.log_softmax(logits, dim=1)  # (batch, num_classes)
+
+        # Apply per-class alpha weights if available
+        if self.alpha is not None:
+            log_probs_weighted = log_probs * self.alpha.unsqueeze(0)
+        else:
+            log_probs_weighted = log_probs
+
+        # Per-sample CE: -log(p_t) weighted
+        batch_idx = torch.arange(len(targets), device=targets.device)
+        ce = -log_probs_weighted[batch_idx, targets]
+
+        # p_t = predicted probability of the correct class
+        # Not detached — gradient flows through both the CE term and the focal modulation term.
+        pt = torch.exp(log_probs[batch_idx, targets])
+        focal_weight = (1.0 - pt) ** self.gamma
+        return (focal_weight * ce).mean()
 
 
 def compute_class_frequencies(y: np.ndarray, num_classes: int = 5) -> np.ndarray:
@@ -68,4 +93,5 @@ def compute_class_frequencies(y: np.ndarray, num_classes: int = 5) -> np.ndarray
     Returns:
         Array of shape (num_classes,) with proportions summing to 1.0.
     """
-    raise NotImplementedError
+    counts = np.bincount(y.astype(int), minlength=num_classes).astype(float)
+    return counts / counts.sum()

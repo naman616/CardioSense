@@ -49,7 +49,7 @@ from app.components.reference_gallery import reference_gallery
 @st.cache_resource
 def get_model():
     """Load and cache the trained ResNet1D model."""
-    raise NotImplementedError
+    return load_model()
 
 
 def main():

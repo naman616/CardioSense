@@ -26,6 +26,8 @@ Design Notes:
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
+from sklearn.metrics import confusion_matrix
 
 CLASS_NAMES = ["Normal\n(N)", "Supraventricular\n(S)", "Ventricular\n(V)", "Fusion\n(F)", "Unknown\n(Q)"]
 
@@ -41,4 +43,37 @@ def plot_confusion_matrix(
     Returns:
         cm: The (optionally normalized) confusion matrix array, shape (5, 5).
     """
-    raise NotImplementedError
+    cm_raw = confusion_matrix(y_true, y_pred, labels=list(range(5)))
+    cm = cm_raw.astype(float)
+
+    if normalize:
+        row_sums = cm.sum(axis=1, keepdims=True).clip(min=1)
+        cm = cm / row_sums
+
+    fig, ax = plt.subplots(figsize=(9, 7))
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt=".2f" if normalize else "d",
+        cmap="Blues",
+        xticklabels=CLASS_NAMES,
+        yticklabels=CLASS_NAMES,
+        linewidths=0.5,
+        ax=ax,
+        vmin=0, vmax=1 if normalize else None,
+    )
+    ax.set_title(
+        "Confusion Matrix (row-normalized, shows per-class recall)",
+        fontsize=12, pad=12,
+    )
+    ax.set_xlabel("Predicted Class", fontsize=10)
+    ax.set_ylabel("True Class", fontsize=10)
+    plt.tight_layout()
+
+    if save_path:
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+
+    plt.show()
+    plt.close(fig)
+    return cm

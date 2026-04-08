@@ -20,6 +20,9 @@ Design Notes:
 
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
 
 
 CLASS_NAMES = ["Normal (N)", "Supraventricular (S)", "Ventricular (V)", "Fusion (F)", "Unknown (Q)"]
@@ -40,4 +43,30 @@ def plot_roc_curves(
     Returns:
         auc_scores: dict mapping class name -> AUC value
     """
-    raise NotImplementedError
+    num_classes = 5
+    y_bin = label_binarize(y_true, classes=list(range(num_classes)))
+
+    fig, ax = plt.subplots(figsize=(8, 7))
+    ax.plot([0, 1], [0, 1], "k--", linewidth=0.8, label="Random Classifier (AUC=0.50)")
+
+    auc_scores = {}
+    for i, (name, color) in enumerate(zip(CLASS_NAMES, CLASS_COLORS)):
+        fpr, tpr, _ = roc_curve(y_bin[:, i], y_prob[:, i])
+        roc_auc = auc(fpr, tpr)
+        auc_scores[name] = roc_auc
+        ax.plot(fpr, tpr, color=color, linewidth=1.8, label=f"{name} (AUC={roc_auc:.3f})")
+
+    ax.set_title("One-vs-Rest ROC Curves — 1D ResNet + Adam", fontsize=12)
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.legend(loc="lower right", fontsize=9)
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    if save_path:
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+
+    plt.show()
+    plt.close(fig)
+    return auc_scores

@@ -27,6 +27,7 @@ Design Notes:
 
 import numpy as np
 import streamlit as st
+import plotly.graph_objects as go
 
 
 CLASS_DESCRIPTIONS = {
@@ -36,6 +37,9 @@ CLASS_DESCRIPTIONS = {
     3: "Simultaneous activation from normal and ectopic pathways; hybrid beat morphology.",
     4: "Beat morphology does not match standard AAMI EC57 arrhythmia category definitions.",
 }
+
+CLASS_NAMES = ["Normal (N)", "Supraventricular (S)", "Ventricular (V)", "Fusion (F)", "Unknown (Q)"]
+CLASS_COLORS = ["#2ca02c", "#d62728", "#d62728", "#d62728", "#ff7f0e"]
 
 
 def prediction_panel(predictions: dict) -> None:
@@ -48,4 +52,48 @@ def prediction_panel(predictions: dict) -> None:
             'confidence'   : float (max probability)
             'probabilities': np.ndarray shape (5,)
     """
-    raise NotImplementedError
+    st.subheader("Classification Result")
+
+    cls_idx = predictions["class_idx"]
+    cls_name = predictions["class_name"]
+    confidence = predictions["confidence"]
+    probs = predictions["probabilities"]
+
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        st.metric(label="Predicted Class", value=cls_name)
+        st.metric(label="Confidence", value=f"{confidence * 100:.1f}%")
+        color = "#2ca02c" if cls_idx == 0 else "#d62728"
+        st.markdown(
+            f"<div style='background:{color};color:white;padding:6px 12px;"
+            f"border-radius:4px;display:inline-block;font-weight:bold'>"
+            f"{'NORMAL' if cls_idx == 0 else 'ARRHYTHMIA DETECTED'}</div>",
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        # Horizontal probability bar chart
+        fig = go.Figure(go.Bar(
+            x=[p * 100 for p in probs],
+            y=CLASS_NAMES,
+            orientation="h",
+            marker_color=[CLASS_COLORS[i] if i == cls_idx else "#aec7e8" for i in range(5)],
+            text=[f"{p*100:.1f}%" for p in probs],
+            textposition="outside",
+        ))
+        fig.update_layout(
+            title="Class Probabilities",
+            xaxis_title="Probability (%)",
+            xaxis=dict(range=[0, 115]),
+            height=220,
+            margin=dict(l=10, r=60, t=40, b=30),
+            showlegend=False,
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.info(f"**Clinical Note:** {CLASS_DESCRIPTIONS.get(cls_idx, '')}")
+    st.caption(
+        "⚠️ **Disclaimer:** For research and demonstration purposes only. "
+        "Not intended for clinical diagnosis or treatment decisions."
+    )

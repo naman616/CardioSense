@@ -21,6 +21,7 @@ Design Notes:
 
 import numpy as np
 import streamlit as st
+import plotly.graph_objects as go
 
 
 def waveform_viewer(ecg_signal: np.ndarray) -> None:
@@ -29,4 +30,37 @@ def waveform_viewer(ecg_signal: np.ndarray) -> None:
     Args:
         ecg_signal: Raw ECG values, shape (187,).
     """
-    raise NotImplementedError
+    st.subheader("ECG Waveform")
+
+    t = list(range(187))
+
+    fig = go.Figure()
+
+    # Shaded regions for P-wave, QRS, T-wave
+    fig.add_vrect(x0=10, x1=30, fillcolor="rgba(0,200,0,0.08)", line_width=0,
+                  annotation_text="P-wave", annotation_position="top left")
+    fig.add_vrect(x0=50, x1=80, fillcolor="rgba(255,0,0,0.08)", line_width=0,
+                  annotation_text="QRS", annotation_position="top left")
+    fig.add_vrect(x0=90, x1=130, fillcolor="rgba(0,0,255,0.08)", line_width=0,
+                  annotation_text="T-wave", annotation_position="top left")
+
+    # ECG line
+    fig.add_trace(go.Scatter(
+        x=t, y=ecg_signal.tolist(),
+        mode="lines",
+        line=dict(color="#1f3d7a", width=1.5),
+        name="ECG Signal",
+        hovertemplate="Sample: %{x}<br>Amplitude: %{y:.4f}<extra></extra>",
+    ))
+
+    fig.update_layout(
+        title="Uploaded ECG Beat (187 samples, ~360 Hz)",
+        xaxis_title="Sample Index",
+        yaxis_title="Amplitude",
+        hovermode="x unified",
+        height=300,
+        margin=dict(l=40, r=40, t=50, b=40),
+        showlegend=False,
+    )
+
+    st.plotly_chart(fig, use_container_width=True)

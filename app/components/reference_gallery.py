@@ -29,6 +29,8 @@ Design Notes:
 
 import numpy as np
 import streamlit as st
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 CLASS_INFO = {
@@ -44,7 +46,47 @@ CLASS_INFO = {
         "desc": "Paced beat or unidentifiable morphology."},
 }
 
+CLASS_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
+REFERENCE_WAVEFORMS_PATH = "data/processed/reference_waveforms.npz"
+
 
 def reference_gallery() -> None:
     """Render the 5-class arrhythmia reference gallery."""
-    raise NotImplementedError
+    st.subheader("Arrhythmia Reference Gallery")
+    st.markdown(
+        "Canonical ECG morphologies for each of the 5 arrhythmia classes "
+        "(representative samples from the MIT-BIH training set)."
+    )
+
+    # Try to load pre-computed reference waveforms
+    waveforms = {}
+    ref_path = Path(REFERENCE_WAVEFORMS_PATH)
+    if ref_path.exists():
+        data = np.load(ref_path, allow_pickle=True)
+        for i in range(5):
+            key = f"class_{i}"
+            if key in data:
+                waveforms[i] = data[key]
+    else:
+        st.warning(
+            "Reference waveforms not found. Run `notebooks/01_eda.ipynb` "
+            "to generate `data/processed/reference_waveforms.npz`."
+        )
+
+    cols = st.columns(5)
+    for i, col in enumerate(cols):
+        info = CLASS_INFO[i]
+        with col:
+            st.markdown(f"**{info['abbr']}** — {info['name']}")
+
+            if i in waveforms:
+                fig, ax = plt.subplots(figsize=(3, 2))
+                ax.plot(waveforms[i], color=CLASS_COLORS[i], linewidth=0.9)
+                ax.axis("off")
+                st.pyplot(fig, use_container_width=True)
+                plt.close(fig)
+            else:
+                st.markdown("*(waveform unavailable)*")
+
+            st.caption(info["desc"])
+            st.markdown(f"Model F1: **{info['f1']}**")

@@ -27,4 +27,9 @@ def split_train_val(
     Returns:
         X_train, X_val, y_train, y_val
     """
-    raise NotImplementedError
+    return train_test_split(
+        X, y,
+        test_size=val_fraction,
+        stratify=y,
+        random_state=random_state,
+    )

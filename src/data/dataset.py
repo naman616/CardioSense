@@ -27,13 +27,15 @@ class ECGDataset(Dataset):
     """PyTorch Dataset for preprocessed ECG heartbeat arrays."""
 
     def __init__(self, X: np.ndarray, y: np.ndarray):
-        raise NotImplementedError
+        # X shape: (N, 187, 1) → permute to (N, 1, 187) for PyTorch Conv1d
+        self.X = torch.tensor(X, dtype=torch.float32).permute(0, 2, 1)  # (N, 1, 187)
+        self.y = torch.tensor(y, dtype=torch.long)
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return len(self.y)
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
-        raise NotImplementedError
+        return self.X[idx], self.y[idx]
 
 
 def build_dataloaders(
@@ -45,4 +47,13 @@ def build_dataloaders(
     Returns:
         train_loader, val_loader, test_loader
     """
-    raise NotImplementedError
+    pin = torch.cuda.is_available()
+    train_ds = ECGDataset(splits["X_train"], splits["y_train"])
+    val_ds   = ECGDataset(splits["X_val"],   splits["y_val"])
+    test_ds  = ECGDataset(splits["X_test"],  splits["y_test"])
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  pin_memory=pin, num_workers=0)
+    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, pin_memory=pin, num_workers=0)
+    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, pin_memory=pin, num_workers=0)
+
+    return train_loader, val_loader, test_loader
