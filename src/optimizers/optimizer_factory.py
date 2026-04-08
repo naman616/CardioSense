@@ -38,15 +38,24 @@ Design Notes:
 
 import torch
 import torch.nn as nn
+from torch.optim import SGD, Adagrad, RMSprop, Adam
 
 
 OPTIMIZER_CONFIGS = {
-    "sgd": {"lr": 0.01},
-    "sgd_momentum": {"lr": 0.01, "momentum": 0.9},
-    "adagrad": {"lr": 0.01},
-    "rmsprop": {"lr": 0.001, "alpha": 0.99},
-    "adam": {"lr": 0.001, "betas": (0.9, 0.999), "eps": 1e-8},
+    # use_scheduler: True → apply CosineAnnealingLR to all optimizers for a fair comparison
+    "sgd":          {"lr": 0.01,  "use_scheduler": True},
+    "sgd_momentum": {"lr": 0.01,  "momentum": 0.9, "use_scheduler": True},
+    "adagrad":      {"lr": 0.01,  "use_scheduler": True},
+    "rmsprop":      {"lr": 0.001, "alpha": 0.99,   "use_scheduler": True},
+    "adam":         {"lr": 0.001, "betas": (0.9, 0.999), "eps": 1e-8, "use_scheduler": True},
 }
+
+
+def optimizer_uses_scheduler(name: str) -> bool:
+    """Return whether the named optimizer should use a global LR schedule."""
+    if name not in OPTIMIZER_CONFIGS:
+        raise ValueError(f"Unknown optimizer: {name!r}")
+    return OPTIMIZER_CONFIGS[name].get("use_scheduler", False)
 
 
 def build_optimizer(
@@ -64,4 +73,18 @@ def build_optimizer(
     Returns:
         Configured torch.optim.Optimizer instance.
     """
-    raise NotImplementedError
+    if name not in OPTIMIZER_CONFIGS:
+        raise ValueError(f"Unknown optimizer: {name!r}. Choose from {list(OPTIMIZER_CONFIGS)}")
+
+    cfg = dict(OPTIMIZER_CONFIGS[name])  # copy to avoid mutation
+    cfg.pop("use_scheduler", None)       # not an optimizer kwarg — consumed by callers
+    params = model.parameters()
+
+    if name in ("sgd", "sgd_momentum"):
+        return SGD(params, weight_decay=weight_decay, **cfg)
+    elif name == "adagrad":
+        return Adagrad(params, weight_decay=weight_decay, **cfg)
+    elif name == "rmsprop":
+        return RMSprop(params, weight_decay=weight_decay, **cfg)
+    elif name == "adam":
+        return Adam(params, weight_decay=weight_decay, **cfg)

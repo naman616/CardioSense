@@ -7,20 +7,18 @@ Responsibility:
     and collects training history for convergence analysis.
 
 Study Design:
-    - Same model architecture (ResNet1D, ~1.2M params)
+    - Same model architecture (ResNet1D, ~790K params)
     - Same dataset (post-SMOTE training set)
-    - Same loss function (FocalLoss, γ=2)
+    - Same loss function (FocalLoss, γ=2, alpha from pre-SMOTE class frequencies)
     - Same batch size (128), max epochs (100), early stopping (patience=15)
     - Same random seed for weight initialization and data shuffling
+    - LR schedule (CosineAnnealingLR) applied to all optimizers for a fair comparison
     - Only the optimizer changes between runs
 
 Results Collected (per optimizer, per epoch):
-    - Training loss
-    - Validation loss
-    - Validation accuracy
-    - Validation macro F1
-    - Per-class F1 (5 classes)
-    - Wall-clock time per epoch
+    - Training loss, training accuracy, training macro F1
+    - Validation loss, validation accuracy, validation macro F1
+    - Learning rate, wall-clock time per epoch
 
 Expected Results (per §5.2 / Table 2):
     Baseline CNN + SGD          : 88-91% accuracy, ~72% macro F1
@@ -37,14 +35,17 @@ Design Notes:
       that theoretically predicts it.
 """
 
+import numpy as np
 import torch
 import torch.nn as nn
 from pathlib import Path
-from .optimizer_factory import build_optimizer
+from .optimizer_factory import build_optimizer, optimizer_uses_scheduler, OPTIMIZER_CONFIGS
 from ..models.resnet1d import ResNet1D
 from ..training.trainer import Trainer
-from ..training.focal_loss import FocalLoss
+from ..training.focal_loss import FocalLoss, compute_class_frequencies
+from ..training.callbacks import EarlyStopping, ModelCheckpoint
 from ..utils.seed import set_seed
+from ..utils.io import save_artifact
 
 
 OPTIMIZERS_TO_COMPARE = ["sgd", "sgd_momentum", "adagrad", "rmsprop", "adam"]
@@ -56,13 +57,49 @@ def run_optimizer_comparison(
     device: torch.device,
     random_seed: int = 42,
     save_dir: str = "results/logs",
+    pre_smote_class_frequencies: np.ndarray | None = None,
 ) -> dict:
     """Run the full 5-optimizer comparison study.
+
+    Args:
+        train_loader: DataLoader for the post-SMOTE balanced training set.
+        val_loader: DataLoader for the validation set.
+        device: Compute device.
+        random_seed: Seed used to reinitialise model weights before each run.
+        save_dir: Directory for per-optimizer history JSON files.
+        pre_smote_class_frequencies: Per-class proportions from the original
+            (pre-SMOTE) training labels, shape (5,).  When provided, these are
+            used as FocalLoss alpha weights so the inverse-frequency weighting
+            reflects the true class imbalance rather than the post-SMOTE
+            uniform distribution.  Compute with::
+
+                compute_class_frequencies(y_train_raw)
+
+            where ``y_train_raw`` is from ``load_mitbih()`` before preprocessing.
 
     Returns:
         histories: dict mapping optimizer_name -> training history dict
     """
-    raise NotImplementedError
+    histories = {}
+    Path(save_dir).mkdir(parents=True, exist_ok=True)
+
+    for name in OPTIMIZERS_TO_COMPARE:
+        print(f"\n{'='*60}")
+        print(f"Training with optimizer: {name.upper()}")
+        print(f"{'='*60}")
+        history = _train_with_optimizer(
+            name, train_loader, val_loader, device, random_seed,
+            pre_smote_class_frequencies,
+        )
+        histories[name] = history
+        # Save JSON history for later plotting
+        save_artifact(
+            {k: [float(v) for v in vals] for k, vals in history.items()},
+            f"{save_dir}/{name}_history.json",
+        )
+        print(f"Saved history: {save_dir}/{name}_history.json")
+
+    return histories
 
 
 def _train_with_optimizer(
@@ -71,6 +108,46 @@ def _train_with_optimizer(
     val_loader,
     device: torch.device,
     random_seed: int,
+    pre_smote_class_frequencies: np.ndarray | None,
 ) -> dict:
     """Train ResNet1D with a single optimizer and return history."""
-    raise NotImplementedError
+    set_seed(random_seed)
+
+    model = ResNet1D().to(device)
+    optimizer = build_optimizer(model, optimizer_name, weight_decay=1e-4)
+
+    # Use pre-SMOTE frequencies so alpha weights reflect the true class imbalance.
+    # Post-SMOTE labels are all equal (freq ≈ 0.2 each) → alpha would be uniform,
+    # defeating the purpose of inverse-frequency weighting.
+    if pre_smote_class_frequencies is not None:
+        freq = pre_smote_class_frequencies
+    else:
+        raise ValueError(
+            "pre_smote_class_frequencies is required. "
+            "Compute with compute_class_frequencies(y_train_raw) from load_mitbih() "
+            "before any preprocessing, then pass it here. "
+            "Using post-SMOTE labels would produce uniform alpha weights, "
+            "defeating the purpose of inverse-frequency weighting."
+        )
+    loss_fn = FocalLoss(gamma=2.0, class_frequencies=freq).to(device)
+
+    callbacks = [
+        EarlyStopping(patience=15, min_delta=1e-4),
+        ModelCheckpoint(
+            save_dir="results/checkpoints",
+            model_name="comparison_resnet1d",
+            optimizer_name=optimizer_name,
+        ),
+    ]
+
+    trainer = Trainer(
+        model=model,
+        optimizer=optimizer,
+        loss_fn=loss_fn,
+        device=device,
+        callbacks=callbacks,
+        use_lr_scheduler=optimizer_uses_scheduler(optimizer_name),
+        max_epochs=100,
+    )
+
+    return trainer.fit(train_loader, val_loader)

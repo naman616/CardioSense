@@ -14,7 +14,7 @@ Architecture (exact spec from proposal):
     --> Dense(128) --> ReLU --> Dropout(p=0.4)
     --> Dense(5) --> Softmax
 
-Total parameters: ~1.2 million
+Total parameters: ~790K
 Training time: ~10 minutes (RTX 4070 Laptop GPU)
 
 Feature Hierarchy:
@@ -43,17 +43,53 @@ class ResNet1D(nn.Module):
 
     def __init__(self, num_classes: int = 5, dropout: float = 0.4):
         super().__init__()
-        raise NotImplementedError
+
+        # Stem: initial feature extraction
+        self.stem = nn.Sequential(
+            nn.Conv1d(1, 32, kernel_size=7, padding=3, bias=False),
+            nn.BatchNorm1d(32),
+            nn.ReLU(),
+        )
+
+        # Residual groups
+        self.layer1 = nn.Sequential(
+            ResidualBlock(32, 32, kernel_size=7, stride=1),
+            ResidualBlock(32, 32, kernel_size=7, stride=1),
+        )
+        self.layer2 = nn.Sequential(
+            ResidualBlock(32, 64, kernel_size=7, stride=2),
+            ResidualBlock(64, 64, kernel_size=7, stride=1),
+        )
+        self.layer3 = nn.Sequential(
+            ResidualBlock(64, 128, kernel_size=7, stride=2),
+            ResidualBlock(128, 128, kernel_size=7, stride=1),
+            ResidualBlock(128, 128, kernel_size=7, stride=1),
+        )
+
+        self.pool = nn.AdaptiveAvgPool1d(1)  # Global Average Pooling
+
+        self.head = nn.Sequential(
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(128, num_classes),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x: Tensor of shape (batch, 187, 1)
+            x: Tensor of shape (batch, 1, 187)
         Returns:
-            logits: Tensor of shape (batch, 5)
+            logits: Raw class scores, shape (batch, num_classes).
+                    Apply softmax externally when probabilities are needed.
         """
-        raise NotImplementedError
+        x = self.stem(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.pool(x).squeeze(-1)  # (batch, 128)
+        return self.head(x)
 
     def get_gradcam_target_layer(self) -> nn.Module:
         """Return the final conv layer for Grad-CAM gradient hooks."""
-        raise NotImplementedError
+        return self.layer3[-1].conv2

@@ -35,6 +35,10 @@ Thumbs.db
 # Streamlit cache
 .streamlit/
 
+# Temp directories
+tmp*/
+torchinductor_*/
+
 # Coverage
 .coverage
 htmlcov/

@@ -43,7 +43,7 @@ resnet1d:
     output_units: 5
     activation: softmax
 
-  approx_params: 1_200_000   # ~1.2M parameters
+  approx_params: 790_000   # ~790K parameters
   gradcam_target: layer3      # final 128-filter residual block group
 
   residual_block:

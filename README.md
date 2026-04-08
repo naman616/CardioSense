@@ -31,7 +31,7 @@ CardioSense/
 │   ├── models/            # M3: Neural Network Architectures
 │   │   ├── residual_block.py  — Conv1D → BN → ReLU → Conv1D → BN → (+skip) → ReLU
 │   │   ├── baseline_cnn.py    — 3-layer CNN baseline
-│   │   └── resnet1d.py        — Full 1D ResNet (~1.2M params, 5-class)
+│   │   └── resnet1d.py        — Full 1D ResNet (~790K params, 5-class)
 │   ├── training/          # M4: Training Infrastructure
 │   │   ├── focal_loss.py      — FL(p_t) = -α_t · (1-p_t)^γ · log(p_t)
 │   │   ├── trainer.py         — Optimizer-agnostic training loop
@@ -133,7 +133,7 @@ Input (187, 1)
 → Global Average Pooling
 → Dense(128) → ReLU → Dropout(0.4)
 → Dense(5) → Softmax
-~1.2M parameters
+~790K parameters
 ```
 
 ---

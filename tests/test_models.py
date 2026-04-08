@@ -19,14 +19,18 @@ class TestBaselineCNN:
         out = model(x)
         assert out.shape == (BATCH_SIZE, 5)
 
-    def test_output_sums_to_one(self):
+    def test_output_is_logits(self):
+        """Models output raw logits — values should not be constrained to [0,1]."""
         model = BaselineCNN(num_classes=5)
         model.eval()
         x = torch.randn(*INPUT_SHAPE).permute(0, 2, 1)
         with torch.no_grad():
             out = model(x)
-        sums = out.sum(dim=1)
+        # Logits can be negative or > 1; softmax(logits) sums to 1
+        sums = torch.softmax(out, dim=1).sum(dim=1)
         torch.testing.assert_close(sums, torch.ones(BATCH_SIZE), atol=1e-5, rtol=0)
+        # At least some logits should be outside [0, 1]
+        assert out.min().item() < 0 or out.max().item() > 1, "Output looks like probabilities, not logits"
 
 
 class TestResNet1D:
@@ -44,5 +48,5 @@ class TestResNet1D:
     def test_approx_param_count(self):
         model = ResNet1D(num_classes=5)
         n_params = sum(p.numel() for p in model.parameters())
-        # Should be approximately 1.2M (allow 50% tolerance)
-        assert 600_000 < n_params < 1_800_000, f"Unexpected param count: {n_params}"
+        # Should be approximately 790K (allow 50% tolerance)
+        assert 400_000 < n_params < 1_200_000, f"Unexpected param count: {n_params}"
