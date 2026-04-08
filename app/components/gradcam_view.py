@@ -59,35 +59,39 @@ def gradcam_panel(
         "when making its prediction. Red = high attention, Blue = low attention."
     )
 
+    cls_idx = predictions["class_idx"]
+    signal_hash = hash(ecg_signal.tobytes())
+
+    # Show cached heatmap if already computed for this signal
+    if st.session_state.get("gradcam_signal_hash") == signal_hash and "gradcam_fig" in st.session_state:
+        st.pyplot(st.session_state["gradcam_fig"])
+        note = CLASS_ATTENTION_NOTES.get(cls_idx, "")
+        st.info(f"**Expected attention pattern:** {note}")
+        return
+
+    # Not yet computed — show button
     if st.button("Compute Grad-CAM Heatmap"):
         with st.spinner("Computing Grad-CAM..."):
             try:
-                cls_idx = predictions["class_idx"]
-                confidence = predictions["confidence"]
-
-                # Preprocess for model input
                 x = normalize(ecg_signal.reshape(1, -1))          # (1, 187)
                 x_tensor = torch.tensor(x, dtype=torch.float32).unsqueeze(0)  # (1, 1, 187)
                 device = next(model.parameters()).device
                 x_tensor = x_tensor.to(device)
 
-                # Compute Grad-CAM
                 gradcam = GradCAM1D(model, model.get_gradcam_target_layer())
                 heatmap = gradcam.compute(x_tensor, target_class=cls_idx)
 
-                # Overlay on original (raw) signal
                 fig = overlay_heatmap(
                     ecg_signal=ecg_signal,
                     heatmap=heatmap,
                     predicted_class=cls_idx,
-                    true_class=cls_idx,  # true class unknown at inference time
-                    confidence=confidence,
+                    true_class=cls_idx,
+                    confidence=predictions["confidence"],
                 )
-                st.pyplot(fig)
-
-                # Clinical interpretation note
-                note = CLASS_ATTENTION_NOTES.get(cls_idx, "")
-                st.info(f"**Expected attention pattern:** {note}")
+                # Cache result and rerun to display it
+                st.session_state["gradcam_fig"] = fig
+                st.session_state["gradcam_signal_hash"] = signal_hash
+                st.rerun()
 
             except Exception as e:
                 st.error(f"Grad-CAM computation failed: {e}")

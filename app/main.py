@@ -69,12 +69,30 @@ def main():
     st.title("CardioSense")
     st.caption("Deep Learning-Based ECG Arrhythmia Classification · Adam Optimizer · 1D ResNet")
 
+    # Persist ECG signal across reruns so Grad-CAM button works after paste
+    if "ecg_signal" not in st.session_state:
+        st.session_state.ecg_signal = None
+
     model = get_model()
-    ecg_signal = upload_panel()
+    new_signal = upload_panel()
+
+    if new_signal is not None:
+        # New signal loaded — store and clear downstream caches
+        st.session_state.ecg_signal = new_signal
+        st.session_state.pop("predictions", None)
+        st.session_state.pop("gradcam_signal_hash", None)
+        st.session_state.pop("gradcam_fig", None)
+
+    ecg_signal = st.session_state.ecg_signal
 
     if ecg_signal is not None:
         waveform_viewer(ecg_signal)
-        predictions = run_inference(model, ecg_signal)
+
+        # Cache predictions — avoid re-running inference on every button click
+        if "predictions" not in st.session_state:
+            st.session_state.predictions = run_inference(model, ecg_signal)
+        predictions = st.session_state.predictions
+
         prediction_panel(predictions)
         gradcam_panel(model, ecg_signal, predictions)
 

@@ -38,6 +38,7 @@ def upload_panel() -> np.ndarray | None:
         "(one row, no header, no label column — MIT-BIH format)."
     )
 
+    st.caption("Tip: If the file picker is slow or restricted to one folder, use the paste option below instead.")
     uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"], label_visibility="collapsed")
 
     if uploaded_file is not None:
@@ -70,7 +71,7 @@ def upload_panel() -> np.ndarray | None:
             return None
 
     # Alternative: text input for quick demos
-    with st.expander("Or paste comma-separated values (demo)"):
+    with st.expander("Or paste comma-separated values (demo)", expanded=True):
         text_input = st.text_area("Paste 187 comma-separated values:", height=80)
         if st.button("Parse Input") and text_input.strip():
             try:
