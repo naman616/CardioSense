@@ -16,8 +16,8 @@ env/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Data — large files not committed
-data/raw/
+# Data — raw CSVs tracked via Git LFS (see .gitattributes)
+# data/raw/  ← removed so LFS-tracked files are committed
 data/processed/*
 !data/processed/reference_waveforms.npz
 
