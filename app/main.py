@@ -36,6 +36,14 @@ Design Notes:
     - Reference gallery uses pre-computed canonical waveforms from EDA.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure project root is on sys.path regardless of launch directory
+_PROJECT_ROOT = Path(__file__).parent.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
 import streamlit as st
 import torch
 from app.utils.inference import load_model, run_inference

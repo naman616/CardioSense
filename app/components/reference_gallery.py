@@ -47,7 +47,8 @@ CLASS_INFO = {
 }
 
 CLASS_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
-REFERENCE_WAVEFORMS_PATH = "data/processed/reference_waveforms.npz"
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+REFERENCE_WAVEFORMS_PATH = _PROJECT_ROOT / "data/processed/reference_waveforms.npz"
 
 
 def reference_gallery() -> None:

@@ -32,7 +32,8 @@ import torch.nn as nn
 from pathlib import Path
 
 CLASS_NAMES = ["Normal (N)", "Supraventricular (S)", "Ventricular (V)", "Fusion (F)", "Unknown (Q)"]
-DEFAULT_CHECKPOINT = "results/checkpoints/resnet1d_adam_best.pth"
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+DEFAULT_CHECKPOINT = str(_PROJECT_ROOT / "results/checkpoints/resnet1d_adam_best.pth")
 
 
 def load_model(
