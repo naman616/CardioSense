@@ -1,0 +1,17 @@
+.git
+.venv
+data/raw
+notebooks
+tests
+documents
+stitch
+__pycache__
+.pytest_cache
+torchinductor_*
+tmp*
+*.pyc
+*.ipynb
+.gitignore
+CLAUDE.md
+Dockerfile
+.dockerignore

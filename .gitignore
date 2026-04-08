@@ -18,10 +18,12 @@ env/
 
 # Data — large files not committed
 data/raw/
-data/processed/
+data/processed/*
+!data/processed/reference_waveforms.npz
 
 # Model checkpoints — large binaries
 results/checkpoints/*.pth
+!results/checkpoints/resnet1d_adam_best.pth
 
 # IDE
 .vscode/
