@@ -5,6 +5,13 @@ notebooks
 tests
 documents
 stitch
+configs
+src/training
+src/eda
+src/evaluation
+src/optimizers
+src/data/loader.py
+src/data/dataset.py
 __pycache__
 .pytest_cache
 torchinductor_*
