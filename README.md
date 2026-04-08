@@ -1,3 +1,14 @@
+---
+title: CardioSense
+emoji: 🫀
+colorFrom: green
+colorTo: teal
+sdk: docker
+pinned: false
+license: mit
+short_description: ECG arrhythmia classifier — 5-class ResNet1D with Grad-CAM
+---
+
 # CardioSense
 
 **Deep Learning-Based ECG Arrhythmia Classification Using the Adam Optimization Algorithm**
