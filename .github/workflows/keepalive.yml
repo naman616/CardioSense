@@ -1,8 +1,12 @@
+name: Keep HF Space Alive
+
 on:
-    schedule:
-      - cron: '0 */23 * * *'   # every 23 hours
+  schedule:
+    - cron: '0 */23 * * *'   # every 23 hours
+  workflow_dispatch:
+
 jobs:
-    ping:
-      runs-on: ubuntu-latest
-      steps:
-        - run: curl -sf https://huggingface.co/spaces/inikunjrathi/CardioSense.hf.space/health
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf https://inikunjrathi-cardiosense.hf.space/ || true
