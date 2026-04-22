@@ -3,74 +3,91 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CardioSense — Research</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<title>CardioSense AI — Research Terminal</title>
+<script src="/assets/tailwind-cdn.js"></script>
+<script src="/assets/chart.umd.min.js"></script>
+<link href="/assets/fonts.css" rel="stylesheet"/>
 <script id="tailwind-config">
 tailwind.config = {
   darkMode: "class",
   theme: {
     extend: {
       colors: {
-        "on-surface": "#dde2f1",
-        "on-primary": "#00382f",
-        "primary": "#d7fff3",
-        "surface": "#0e131e",
-        "surface-container": "#1a202a",
-        "outline-variant": "#3a4a46",
-        "on-surface-variant": "#b9cac4",
-        "surface-container-highest": "#2f3540",
-        "error": "#ffb4ab",
+        "primary-fixed": "#ffdad8",
+        "surface-container-high": "#2a2a2a",
+        "surface-container-lowest": "#0e0e0e",
+        "surface": "#131313",
+        "secondary": "#c8c6c5",
         "error-container": "#93000a",
+        "surface-dim": "#131313",
+        "inverse-on-surface": "#313030",
+        "primary-container": "#ff5357",
+        "on-primary": "#68000e",
+        "outline-variant": "#5f3e3d",
+        "primary": "#ffb3af",
+        "outline": "#b08784",
+        "on-background": "#e5e2e1",
+        "on-primary-container": "#5c000b",
+        "surface-container-low": "#1c1b1b",
         "on-error-container": "#ffdad6",
-        "secondary": "#d2bbff",
-        "surface-container-low": "#161c26",
-        "primary-container": "#00f5d4",
-        "on-primary-container": "#006c5c",
-        "surface-container-lowest": "#080e18",
+        "surface-bright": "#3a3939",
+        "tertiary": "#6ed4f1",
+        "on-surface-variant": "#e9bcb9",
+        "background": "#131313",
+        "surface-variant": "#353534",
+        "surface-container-highest": "#353534",
+        "on-surface": "#e5e2e1",
+        "surface-container": "#201f1f",
+        "error": "#ffb4ab",
+      },
+      borderRadius: {
+        "DEFAULT": "0px",
+        "lg": "0px",
+        "xl": "0px",
+        "2xl": "0px",
+        "3xl": "0px",
+        "full": "0px",
+        "sm": "0px",
       },
       fontFamily: {
-        headline: ["Space Grotesk"],
-        body: ["Inter"],
-        mono: ["JetBrains Mono"],
-      },
-    },
-  },
+        "headline": ["Space Grotesk", "sans-serif"],
+        "body": ["Inter", "sans-serif"],
+        "mono": ["JetBrains Mono", "monospace"]
+      }
+    }
+  }
 }
 </script>
 <style>
-  body {
-    background-color: #050a14;
-    color: #dde2f1;
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
-  }
-  .scanlines {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background:
-      linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%),
-      linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02));
-    background-size: 100% 4px, 3px 100%;
-    pointer-events: none; z-index: 100;
-  }
-  .glass-panel {
-    background: rgba(255,255,255,0.04);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
-  }
+  body { font-family: 'Inter', sans-serif; background-color: #131313; color: #e5e2e1; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-headline { font-family: 'Space Grotesk', sans-serif; }
+
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
-  /* Section heading accent */
+
+  /* Section panel */
+  .cmd-panel {
+    background: #1c1b1b;
+    border: 1px solid rgba(95,62,61,0.25);
+  }
+  .cmd-panel-header {
+    background: #2a2a2a;
+    border-bottom: 1px solid rgba(95,62,61,0.20);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Section title */
   .section-title {
     font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 1.125rem;
+    font-weight: 900;
+    font-size: 1.1rem;
     letter-spacing: -0.02em;
-    color: #dde2f1;
+    color: #e5e2e1;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -79,96 +96,139 @@ tailwind.config = {
     content: '';
     display: inline-block;
     width: 3px; height: 1.1em;
-    background: #00f5d4;
-    border-radius: 2px;
-    box-shadow: 0 0 8px rgba(0,245,212,0.6);
+    background: #FF0033;
     flex-shrink: 0;
   }
+
   /* Body text */
   .body-text {
-    font-size: 14px;
-    color: #94a3b8;
-    line-height: 1.8;
+    font-size: 13.5px;
+    color: #b08784;
+    line-height: 1.85;
   }
-  .body-text strong { color: #b9cac4; }
+  .body-text strong { color: #e9bcb9; }
   .body-text code {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: #00f5d4;
-    background: rgba(0,245,212,0.06);
+    font-size: 11.5px;
+    color: #ffb3af;
+    background: rgba(255,179,175,0.07);
     padding: 1px 5px;
-    border-radius: 3px;
   }
+
   /* Data table */
-  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   .data-table th {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #00f5d4;
-    padding: 8px 14px;
-    border-bottom: 1px solid rgba(0,245,212,0.15);
+    color: #ffb3af;
+    padding: 7px 12px;
+    border-bottom: 1px solid rgba(255,83,87,0.15);
     text-align: left;
     font-weight: 600;
   }
   .data-table td {
-    padding: 9px 14px;
-    color: #94a3b8;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 8px 12px;
+    color: #b08784;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 11.5px;
   }
   .data-table tr:hover td { background: rgba(255,255,255,0.02); }
-  .data-table td.highlight { color: #00f5d4; font-weight: 700; }
+  .data-table td.highlight { color: #ffb3af; font-weight: 700; }
   .data-table td.warn { color: #fbbf24; }
+
   /* Architecture block */
   .arch-block {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: #64748b;
+    font-size: 11.5px;
+    color: #5f3e3d;
     line-height: 1.9;
-    padding: 16px 20px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 12px;
-    border: 1px solid rgba(0,245,212,0.08);
+    padding: 14px 18px;
+    background: #0e0e0e;
+    border: 1px solid rgba(255,83,87,0.08);
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.08));
+    background-size: 100% 4px;
   }
-  .arch-block .layer { color: #b9cac4; }
-  .arch-block .arrow { color: #00f5d4; }
-  .arch-block .note { color: #4a5568; font-style: italic; }
+  .arch-block .layer { color: #e9bcb9; }
+  .arch-block .arrow { color: #FF5357; }
+  .arch-block .note { color: #5f3e3d; font-style: italic; }
+
   /* Reference list */
   .ref-item {
-    font-size: 13px;
-    color: #64748b;
+    font-size: 12.5px;
+    color: #9e8c8a;
     line-height: 1.7;
-    padding: 10px 0;
+    padding: 9px 0;
     border-bottom: 1px solid rgba(255,255,255,0.04);
   }
   .ref-item:last-child { border-bottom: none; }
-  .ref-item strong { color: #94a3b8; }
+  .ref-item strong { color: #e9bcb9; }
+  .ref-item em { color: #b08784; }
+
   /* Pill badges */
   .pill {
     display: inline-flex; align-items: center;
     padding: 2px 10px;
-    border-radius: 99px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
   }
-  /* Expandable chart containers */
-  .chart-expandable {
+
+  /* Chart containers */
+  .chart-container {
+    background: #0e0e0e;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 16px;
     cursor: zoom-in;
-    transition: box-shadow 0.2s, border-color 0.2s;
+    transition: border-color 0.2s;
   }
-  .chart-expandable:hover {
-    box-shadow: 0 0 0 1px rgba(0,245,212,0.35), 0 0 20px rgba(0,245,212,0.10);
-    border-color: rgba(0,245,212,0.25) !important;
+  .chart-container:hover {
+    border-color: rgba(255,83,87,0.30);
   }
+
+  /* Metric cards */
+  .metric-card {
+    background: #0e0e0e;
+    border: 1px solid rgba(95,62,61,0.30);
+    padding: 16px;
+    text-align: center;
+  }
+  .metric-card:hover { border-color: rgba(255,83,87,0.35); }
+
+  /* Blockquote */
+  blockquote {
+    border-left: 2px solid #FF0033;
+    padding-left: 16px;
+    color: #b08784;
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Notebook steps */
+  .nb-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(95,62,61,0.15);
+    border-left: 3px solid transparent;
+    transition: border-left-color 0.15s, background 0.15s;
+  }
+  .nb-step:hover {
+    background: rgba(255,255,255,0.04);
+    border-left-color: #FF5357;
+  }
+
   /* Lightbox */
   #researchLightbox {
     display: none;
     position: fixed; inset: 0; z-index: 9999;
-    background: rgba(5,10,20,0.92);
+    background: rgba(5,5,5,0.92);
     backdrop-filter: blur(12px);
     align-items: center;
     justify-content: center;
@@ -178,27 +238,30 @@ tailwind.config = {
   #researchLightbox img {
     max-width: 92vw;
     max-height: 88vh;
-    border-radius: 16px;
-    border: 1px solid rgba(0,245,212,0.20);
-    box-shadow: 0 0 60px rgba(0,245,212,0.12), 0 32px 80px rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,83,87,0.25);
+    box-shadow: 0 0 60px rgba(255,83,87,0.12), 0 32px 80px rgba(0,0,0,0.7);
     animation: lbZoomIn 0.2s ease;
   }
   #lbClose {
     position: absolute; top: 20px; right: 24px;
-    font-size: 28px; color: rgba(255,255,255,0.5);
+    font-size: 28px; color: rgba(255,255,255,0.4);
     cursor: pointer; line-height: 1;
     transition: color 0.15s;
   }
-  #lbClose:hover { color: #00f5d4; }
+  #lbClose:hover { color: #ffb3af; }
   @keyframes lbZoomIn {
     from { opacity: 0; transform: scale(0.88); }
     to   { opacity: 1; transform: scale(1); }
   }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #1c1b1b; }
+  ::-webkit-scrollbar-thumb { background: #353534; }
+  ::-webkit-scrollbar-thumb:hover { background: #474746; }
 </style>
 </head>
-<body class="bg-surface">
-
-<div class="scanlines"></div>
+<body class="bg-surface text-on-surface">
 
 <!-- Lightbox -->
 <div id="researchLightbox">
@@ -206,665 +269,706 @@ tailwind.config = {
   <img id="lbImg" src="" alt="Expanded chart" />
 </div>
 
-<!-- Nav (identical to index.html) -->
-<nav class="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-4
-            bg-surface/10 backdrop-blur-xl border-b border-teal-500/10">
-  <div class="flex items-center gap-8">
-    <span class="text-xl font-bold tracking-tighter text-teal-400
-                 drop-shadow-[0_0_8px_rgba(0,245,212,0.6)] font-['Space_Grotesk']">
-      CardioSense
-    </span>
-    <div class="hidden md:flex items-center gap-6 font-['Space_Grotesk'] text-sm tracking-tight">
-      <a href="/" class="text-slate-400 hover:text-teal-300 transition-colors">Analytics</a>
-      <a href="/research" class="text-teal-400 border-b border-teal-400 pb-0.5">Research</a>
+<!-- Top Nav -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-3 bg-[#131313] border-b border-[#1C1B1B]">
+  <div class="flex items-center space-x-8">
+    <span class="text-xl font-black tracking-tighter text-[#FF0033] uppercase font-headline">CARDIOSENSE AI</span>
+    <div class="flex space-x-6">
+      <a class="text-[#353534] font-medium hover:text-[#FFB3AF] transition-colors duration-150 font-mono text-sm uppercase tracking-wider pb-1 px-1" href="/">TERMINAL</a>
+      <a class="text-[#FFB3AF] font-bold border-b-2 border-[#FF0033] pb-1 transition-colors duration-150 font-mono text-sm uppercase tracking-wider" href="/research">RESEARCH</a>
     </div>
   </div>
-  <div class="flex items-center gap-2 px-3 py-1.5 rounded-full
-              bg-surface-container-highest/60 border border-outline-variant/30">
-    <span class="material-symbols-outlined text-teal-400 text-sm"
-          style="font-variation-settings:'FILL' 1;">sensors</span>
-    <span class="text-[10px] text-teal-400 font-mono tracking-widest uppercase">
-      Live Core Active
-    </span>
+  <div class="flex items-center gap-2 px-3 py-1 border border-outline-variant/30">
+    <span class="w-1.5 h-1.5 bg-[#FF0033] animate-pulse inline-block"></span>
+    <span class="text-[10px] font-mono text-primary tracking-widest uppercase">LIVE DATA</span>
   </div>
 </nav>
 
-<main class="pt-24 pb-20 px-6 md:px-16 max-w-5xl mx-auto">
+<div class="pt-[52px]">
 
-  <!-- Page header -->
-  <div class="mb-14">
-    <p class="text-[11px] font-mono text-teal-400/60 tracking-widest uppercase mb-3">
-      Research Documentation
-    </p>
-    <h1 class="text-4xl md:text-5xl font-black font-headline tracking-tighter text-on-surface mb-4"
-        style="text-shadow: 0 0 40px rgba(0,245,212,0.15)">
-      Deep Learning-Based<br>ECG Arrhythmia Classification
-    </h1>
-    <p class="body-text max-w-2xl">
-      Empirical validation of the <strong>Adam optimization algorithm</strong> (Kingma &amp; Ba, 2015)
-      applied to 5-class cardiac arrhythmia detection using a 1D Residual Neural Network trained on
-      the MIT-BIH Arrhythmia Database.
-    </p>
-    <div class="flex flex-wrap gap-3 mt-5">
-      <span class="pill bg-teal-500/10 text-teal-400 border border-teal-500/20">PyTorch 2.x</span>
-      <span class="pill bg-secondary/10 text-secondary border border-secondary/20">MIT-BIH · 109,446 beats</span>
-      <span class="pill bg-amber-400/10 text-amber-400 border border-amber-400/20">5-class classification</span>
-      <span class="pill bg-white/5 text-slate-400 border border-white/10">Captum · Grad-CAM</span>
-    </div>
-  </div>
+  <!-- Main scrollable content -->
+  <main class="mx-auto w-full pb-20 px-6 md:px-10 pt-8 max-w-5xl">
 
-  <div class="flex flex-col gap-10">
-
-    <!-- ── 1. Problem Statement ──────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Problem Statement</h2>
-      <p class="body-text">
-        Cardiac arrhythmias affect over 1.5% of the global population and are a leading cause of
-        sudden cardiac death. Manual interpretation of 24-hour Holter ECG recordings is time-consuming
-        and subject to inter-observer variability. This project implements an end-to-end deep learning
-        pipeline that classifies individual heartbeat segments into five clinically defined categories,
-        with the specific research question:
+    <!-- Page header -->
+    <div class="mb-10">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-1.5 h-1.5 bg-[#FF0033] animate-pulse inline-block"></span>
+        <p class="text-[10px] font-mono text-primary/60 tracking-widest uppercase">Model Evaluation Suite</p>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-black font-headline tracking-tighter text-on-surface mb-4 uppercase"
+          style="text-shadow: 0 0 40px rgba(255,83,87,0.15)">
+        ResNet1D vs Baseline
+      </h1>
+      <p class="body-text max-w-2xl">
+        Empirical validation of the <strong>Adam optimization algorithm</strong> (Kingma &amp; Ba, 2015)
+        applied to 5-class cardiac arrhythmia detection using a 1D Residual Neural Network trained on
+        the MIT-BIH Arrhythmia Database.
       </p>
-      <blockquote class="mt-5 pl-5 border-l-2 border-teal-500/40 italic text-on-surface-variant text-sm leading-relaxed">
-        "Does the Adam optimizer's theoretical advantages — adaptive per-parameter learning rates,
-        bias-corrected moment estimates, and O(√T) regret bound — translate to measurably superior
-        convergence and final accuracy compared to SGD, Adagrad, and RMSProp on a severe-class-imbalance
-        ECG classification task?"
-      </blockquote>
+      <div class="flex flex-wrap gap-2 mt-5">
+        <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20">PyTorch 2.x</span>
+        <span class="pill bg-surface-container text-secondary border border-outline-variant/20">MIT-BIH · 109,446 beats</span>
+        <span class="pill bg-amber-400/10 text-amber-400 border border-amber-400/20">5-class classification</span>
+        <span class="pill bg-surface-container text-outline border border-outline-variant/20">Captum · Grad-CAM</span>
+      </div>
+    </div>
 
-      <!-- ECG Signal Visualization -->
-      <div class="mt-7">
-        <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-          Representative Normal ECG Beat — 187 samples @ 360 Hz (~0.52 s)
-        </p>
-        <div class="relative h-[180px] bg-slate-950/70 rounded-2xl overflow-hidden border border-white/5 p-3">
-          <div class="absolute inset-0 opacity-8 pointer-events-none grid grid-cols-12 p-3 gap-1">
-            <div class="border-r border-teal-500/20"></div><div class="border-r border-teal-500/20"></div>
-            <div class="border-r border-teal-500/20"></div><div class="border-r border-teal-500/20"></div>
-            <div class="border-r border-teal-500/20"></div><div class="border-r border-teal-500/20"></div>
-            <div class="border-r border-teal-500/20"></div><div class="border-r border-teal-500/20"></div>
-            <div class="border-r border-teal-500/20"></div><div class="border-r border-teal-500/20"></div>
-            <div class="border-r border-teal-500/20"></div><div></div>
-          </div>
-          <canvas id="ecgDemoChart" class="w-full h-full relative z-10"></canvas>
+    <div class="flex flex-col gap-6">
+
+      <!-- ── 1. Problem Statement ──────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Problem Statement</h2>
         </div>
-        <div class="flex gap-6 mt-2">
-          <span class="text-[11px] font-mono text-green-400/70 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-sm inline-block bg-green-500/30 border border-green-500/50"></span>P-wave (10–30)
-          </span>
-          <span class="text-[11px] font-mono text-red-400/70 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-sm inline-block bg-red-500/30 border border-red-500/50"></span>QRS complex (50–80)
-          </span>
-          <span class="text-[11px] font-mono text-blue-400/70 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-sm inline-block bg-blue-500/30 border border-blue-500/50"></span>T-wave (90–130)
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── 2. Dataset ────────────────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Dataset</h2>
-      <p class="body-text mb-6">
-        Primary dataset: <strong>MIT-BIH Arrhythmia Database</strong> (Moody &amp; Mark, 2001) —
-        48 half-hour two-lead Holter recordings from 47 subjects, sampled at <strong>360 Hz</strong>.
-        Each heartbeat is segmented into a fixed 187-sample window centred on the R-peak.
-        Secondary dataset: <strong>PTB Diagnostic ECG DB</strong> used in notebook 08 for
-        binary generalisation testing (healthy vs. myocardial infarction).
-      </p>
-      <table class="data-table mb-6">
-        <thead>
-          <tr>
-            <th>Class</th><th>Label</th><th>Description</th><th>Count</th><th>% of total</th><th>Challenge</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td class="highlight">0 — N</td><td>Normal</td><td>Normal sinus rhythm</td><td>90,589</td><td class="highlight">82.8%</td><td>Dominant class</td></tr>
-          <tr><td>1 — S</td><td>Supraventricular</td><td>Ectopic, narrow QRS</td><td>2,779</td><td>2.5%</td><td>Subtle P-wave changes</td></tr>
-          <tr><td>2 — V</td><td>Ventricular</td><td>PVC, wide bizarre QRS</td><td>7,236</td><td>6.6%</td><td>Morphologically distinct</td></tr>
-          <tr><td class="warn">3 — F</td><td>Fusion</td><td>N + V hybrid beat</td><td>803</td><td class="warn">0.7%</td><td>Rarest · hardest to separate</td></tr>
-          <tr><td>4 — Q</td><td>Unknown / Paced</td><td>Paced or unclassifiable</td><td>8,039</td><td>7.3%</td><td>High morphological variability</td></tr>
-        </tbody>
-      </table>
-      <p class="body-text mb-6">
-        The extreme imbalance (Normal 83% vs. Fusion 0.7%) motivates two specific design choices:
-        <strong>Focal Loss</strong> to down-weight easy negatives during training, and
-        <strong>SMOTE</strong> oversampling applied exclusively to the training split to prevent
-        data leakage into validation.
-      </p>
-
-      <!-- Class Distribution Chart -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-        Class Distribution — MIT-BIH (109,446 beats)
-      </p>
-      <div class="h-[220px] bg-slate-950/50 rounded-2xl p-4 border border-white/5">
-        <canvas id="classDistChart"></canvas>
-      </div>
-    </div>
-
-    <!-- ── 3. Preprocessing Pipeline ────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Preprocessing Pipeline</h2>
-      <p class="body-text mb-5">
-        All preprocessing is implemented in <code>src/data/preprocessor.py</code>.
-        The pipeline runs on the training split only; the test split receives only Z-score
-        normalisation to prevent leakage.
-      </p>
-      <div class="arch-block mb-5">
-        <span class="layer">Raw CSV (187 values/row, integer amplitude)</span><br>
-        <span class="arrow">  ↓  Z-score normalise</span>   <span class="note">per-sample: (x - μ) / σ — removes patient-level amplitude differences</span><br>
-        <span class="arrow">  ↓  IQR outlier removal</span> <span class="note">eliminates Holter digitisation artefacts (|z| &gt; 3 IQR)</span><br>
-        <span class="arrow">  ↓  Stratified 85/15 split</span> <span class="note">preserves class ratios in train and val</span><br>
-        <span class="arrow">  ↓  SMOTE (train only)</span>  <span class="note">synthetic minority oversampling — balances class counts</span><br>
-        <span class="arrow">  ↓  Reshape → (N, 1, 187)</span> <span class="note">PyTorch Conv1d format: (batch, channels, length)</span>
-      </div>
-      <p class="body-text">
-        Per-sample Z-score normalisation is particularly important for this task because
-        ECG amplitude varies across patients and recording conditions. Using population-level
-        statistics would introduce data leakage and reduce generalisation. At inference time,
-        the same per-sample normalisation is applied — no stored training statistics are required.
-      </p>
-    </div>
-
-    <!-- ── 4. Model Architecture ─────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Model Architecture — 1D ResNet</h2>
-      <p class="body-text mb-5">
-        The primary model (<code>src/models/resnet1d.py</code>) is a 1D Residual Network
-        adapted from He et al. (2016) for time-series classification. Residual connections
-        allow gradient flow through deep networks and prevent vanishing gradients during
-        training with Adam's adaptive updates.
-        Total parameters: <strong>~790,000</strong>.
-      </p>
-      <div class="arch-block mb-5">
-        <span class="layer">Input: (batch, 1, 187)</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">Stem: Conv1d(1→32, k=7, s=1) → BN → ReLU</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">layer1: ResidualBlock(32, s=1) × 2</span>     <span class="note">  low-level: P-wave &amp; QRS shape</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">layer2: ResidualBlock(64, s=2) × 2</span>     <span class="note">  mid-level: beat intervals, rhythm</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">layer3: ResidualBlock(128, s=2) × 2</span>    <span class="note">  high-level: arrhythmia class patterns</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">Global Average Pooling (temporal dim)</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">Dense(128) → ReLU → Dropout(0.4)</span><br>
-        <span class="arrow">  ↓  </span><span class="layer">Dense(5) → Softmax</span>
-      </div>
-      <p class="body-text">
-        Each <code>ResidualBlock</code> follows the pattern:
-        Conv1d → BN → ReLU → Conv1d → BN → (+skip connection) → ReLU.
-        Stride-2 blocks use a 1×1 projection shortcut to match dimensions.
-        The Grad-CAM target layer is <code>layer3[-1].conv2</code>, exposed via
-        <code>model.get_gradcam_target_layer()</code>.
-      </p>
-      <p class="body-text mt-4 mb-7">
-        <strong>Baseline for comparison:</strong> a 3-block 1D CNN (<code>src/models/baseline_cnn.py</code>)
-        with no residual connections, used only in the optimizer comparison study to ensure
-        architecture complexity does not confound optimizer performance differences.
-      </p>
-
-      <!-- Architecture Visual -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-4">
-        Network Architecture — Visual Overview
-      </p>
-      <div id="archVisual" class="flex flex-col gap-2"></div>
-    </div>
-
-    <!-- ── 5. Training Setup ──────────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Training Setup</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-        <div>
-          <p class="text-xs font-mono text-teal-400/70 uppercase tracking-widest mb-3">
-            Adam Hyperparameters (paper defaults)
+        <div class="p-6 flex flex-col gap-5">
+          <p class="body-text">
+            Cardiac arrhythmias affect over 1.5% of the global population and are a leading cause of
+            sudden cardiac death. Manual interpretation of 24-hour Holter ECG recordings is time-consuming
+            and subject to inter-observer variability. This project implements an end-to-end deep learning
+            pipeline that classifies individual heartbeat segments into five clinically defined categories,
+            with the specific research question:
           </p>
-          <table class="data-table">
-            <thead><tr><th>Parameter</th><th>Value</th><th>Source</th></tr></thead>
-            <tbody>
-              <tr><td>Learning rate α</td><td class="highlight">0.001</td><td>Algorithm 1</td></tr>
-              <tr><td>β₁ (1st moment)</td><td class="highlight">0.9</td><td>Algorithm 1</td></tr>
-              <tr><td>β₂ (2nd moment)</td><td class="highlight">0.999</td><td>Algorithm 1</td></tr>
-              <tr><td>ε (numerical stab.)</td><td>1e-8</td><td>Algorithm 1</td></tr>
-              <tr><td>Weight decay</td><td>0</td><td>—</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <p class="text-xs font-mono text-teal-400/70 uppercase tracking-widest mb-3">
-            Training Configuration
-          </p>
-          <table class="data-table">
-            <thead><tr><th>Setting</th><th>Value</th></tr></thead>
-            <tbody>
-              <tr><td>Batch size</td><td class="highlight">128</td></tr>
-              <tr><td>Max epochs</td><td>100</td></tr>
-              <tr><td>Early stopping</td><td>patience = 15 (val macro F1)</td></tr>
-              <tr><td>LR schedule</td><td>CosineAnnealingLR (T_max=100)</td></tr>
-              <tr><td>Focal Loss γ</td><td class="highlight">2.0</td></tr>
-              <tr><td>Focal Loss α</td><td>inverse class frequency</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+          <blockquote>
+            "Does the Adam optimizer's theoretical advantages — adaptive per-parameter learning rates,
+            bias-corrected moment estimates, and O(√T) regret bound — translate to measurably superior
+            convergence and final accuracy compared to SGD, Adagrad, and RMSProp on a severe-class-imbalance
+            ECG classification task?"
+          </blockquote>
 
-      <p class="body-text">
-        <strong>Focal Loss</strong> (Lin et al., 2017): FL(pₜ) = −αₜ · (1−pₜ)^γ · log(pₜ).
-        The modulating factor (1−pₜ)^γ reduces the loss contribution of well-classified easy examples,
-        forcing the model to focus on hard minority-class beats. With γ=2.0, a sample classified with
-        90% confidence contributes only 1% of the cross-entropy loss.
-      </p>
-      <p class="body-text mt-3 mb-7">
-        <strong>Early stopping</strong> monitors <em>validation macro F1</em> rather than accuracy,
-        because accuracy is misleading under class imbalance — a model predicting only "Normal"
-        achieves 83% accuracy while being clinically useless.
-      </p>
-
-      <!-- Focal Loss Curve -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-        Focal Loss vs. Cross-Entropy — Effect of Modulating Factor (1−pₜ)^γ
-      </p>
-      <div class="h-[230px] bg-slate-950/50 rounded-2xl p-4 border border-white/5">
-        <canvas id="focalLossChart"></canvas>
-      </div>
-      <p class="text-xs font-mono text-slate-600 mt-2">
-        At p=0.9 (confident prediction): CE loss ≈ 0.105 · FL(γ=2) ≈ 0.001 — 99% reduction forces focus on hard examples.
-      </p>
-    </div>
-
-    <!-- ── 6. Optimizer Comparison ───────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Optimizer Comparison Study</h2>
-      <p class="body-text mb-6">
-        Five optimizers are trained through the identical <code>Trainer</code> loop
-        (<code>src/optimizers/comparison.py</code>) on the same data split and random seed.
-        Predictions from the Adam paper (§4, §5, §6) are verified empirically.
-      </p>
-      <table class="data-table mb-5">
-        <thead>
-          <tr>
-            <th>Optimizer</th><th>Adam Paper Prediction</th><th>Expected Macro F1</th><th>Why</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>SGD (vanilla)</td>
-            <td>Stalls on sparse minority gradients (§6.1)</td>
-            <td class="warn">~72%</td>
-            <td>No adaptation — Fusion &amp; SVE nearly invisible</td>
-          </tr>
-          <tr>
-            <td>SGD + Momentum</td>
-            <td>Faster but no per-parameter adaptation (§5)</td>
-            <td class="warn">~73%</td>
-            <td>Momentum helps convergence speed, not minority classes</td>
-          </tr>
-          <tr>
-            <td>Adagrad</td>
-            <td>Monotonically decaying LR stalls late (§5)</td>
-            <td>~78%</td>
-            <td>LR → 0 prevents recovery from early suboptimal states</td>
-          </tr>
-          <tr>
-            <td>RMSProp</td>
-            <td>Diverges without bias correction (§6.4)</td>
-            <td>~84%</td>
-            <td>Lacks bias correction → unstable early training</td>
-          </tr>
-          <tr>
-            <td class="highlight">Adam</td>
-            <td class="highlight">O(√T) regret · all advantages combined (§4)</td>
-            <td class="highlight">≥93%</td>
-            <td>Adaptive LR + bias correction + momentum</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="body-text mb-7">
-        The sparse gradient problem (§6.1) is particularly relevant here: the Fusion class
-        (0.7%) produces gradients only in 7 of every 1000 batches on average.
-        Adam's bias-corrected running averages ensure these rare gradients are not drowned out,
-        whereas vanilla SGD effectively ignores them.
-      </p>
-
-      <!-- Optimizer Comparison Chart -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-        Expected Macro F1 by Optimizer — Adam Paper Predictions (§4, §5, §6.1, §6.4)
-      </p>
-      <div class="h-[380px] bg-slate-950/50 rounded-2xl p-4 border border-white/5">
-        <canvas id="optimizerChart"></canvas>
-      </div>
-    </div>
-
-    <!-- ── 7. Grad-CAM Explainability ────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Grad-CAM Explainability</h2>
-      <p class="body-text mb-5">
-        Gradient-weighted Class Activation Mapping is implemented via
-        <strong>Captum</strong>'s <code>LayerGradCam</code> targeting
-        <code>model.layer3[-1].conv2</code> — the final convolutional layer before global
-        average pooling, where the highest-level feature representations are formed.
-      </p>
-      <div class="arch-block mb-5">
-        <span class="arrow">1. </span><span class="layer">Forward pass: input (1, 1, 187) → predicted class score</span><br>
-        <span class="arrow">2. </span><span class="layer">Backprop gradients to layer3[-1].conv2 feature maps</span><br>
-        <span class="arrow">3. </span><span class="layer">Global-average gradients over temporal dim → channel weights αₖ</span><br>
-        <span class="arrow">4. </span><span class="layer">Weighted sum of activation maps → 1D CAM (length L')</span><br>
-        <span class="arrow">5. </span><span class="layer">ReLU → keep only positive contributions</span><br>
-        <span class="arrow">6. </span><span class="layer">Linear interpolation upsample → length 187</span><br>
-        <span class="arrow">7. </span><span class="layer">Normalise to [0, 1] · overlay on raw signal (RdYlBu_r colormap)</span>
-      </div>
-      <p class="body-text mb-4">
-        <strong>Clinical verification criteria:</strong>
-      </p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-xl bg-secondary/5 border border-secondary/20">
-          <p class="text-xs font-mono text-secondary uppercase tracking-widest mb-2">Class S — Supraventricular</p>
-          <p class="body-text text-sm">
-            Heatmap should peak at <strong>P-wave region (samples 10–30)</strong>.
-            Supraventricular arrhythmias originate above the ventricles; the diagnostic
-            signal is the abnormal P-wave morphology preceding the (narrow) QRS complex.
-          </p>
-        </div>
-        <div class="p-4 rounded-xl bg-error/5 border border-error/20">
-          <p class="text-xs font-mono text-error uppercase tracking-widest mb-2">Class V — Ventricular</p>
-          <p class="body-text text-sm">
-            Heatmap should peak at <strong>QRS complex (samples 50–80)</strong>.
-            Ventricular ectopic beats are characterised by a wide, bizarre QRS produced
-            by aberrant ventricular depolarisation — the defining morphological feature.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── 8. Expected Results ───────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Expected Results</h2>
-      <p class="body-text mb-6">
-        Target performance on the held-out MIT-BIH test set (15% stratified split):
-      </p>
-      <table class="data-table mb-5">
-        <thead>
-          <tr><th>Class</th><th>Arrhythmia</th><th>Dataset %</th><th>Expected F1</th><th>Notes</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>0 — N</td><td>Normal</td><td>82.8%</td><td class="highlight">~99%</td><td>Dominant class, easy to learn</td></tr>
-          <tr><td>1 — S</td><td>Supraventricular</td><td>2.5%</td><td>~88%</td><td>Subtle P-wave changes</td></tr>
-          <tr><td>2 — V</td><td>Ventricular</td><td>6.6%</td><td class="highlight">~95%</td><td>Distinct morphology</td></tr>
-          <tr><td class="warn">3 — F</td><td>Fusion Beat</td><td class="warn">0.7%</td><td class="warn">~82%</td><td>Rarest · SMOTE critical here</td></tr>
-          <tr><td>4 — Q</td><td>Unknown / Paced</td><td>7.3%</td><td>~91%</td><td>Variable morphology</td></tr>
-          <tr style="background:rgba(0,245,212,0.03)">
-            <td class="highlight">Overall</td><td>—</td><td>—</td>
-            <td class="highlight">≥98% acc · ≥93% macro F1</td>
-            <td>Adam vs SGD gap: ~21% macro F1</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="body-text">
-        The large Adam vs. SGD performance gap on macro F1 (predicted ~21 percentage points)
-        is the primary empirical finding. Accuracy alone would not reveal this — both SGD and Adam
-        achieve high accuracy by correctly classifying the dominant Normal class, but only Adam
-        successfully learns the rare minority classes.
-      </p>
-    </div>
-
-    <!-- ── 9. Achieved Results ───────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-2">Achieved Results</h2>
-      <p class="body-text mb-6">
-        Final evaluation on the held-out MIT-BIH test set (15% stratified split, ~16,000 samples).
-        The model was trained with Adam + CosineAnnealingLR for 100 epochs; the best checkpoint
-        (epoch 98, val macro F1 = 0.9075) was evaluated once on the unseen test set.
-      </p>
-
-      <!-- Overall metric cards -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="rounded-2xl p-5 border border-teal-500/20 bg-teal-500/5 text-center">
-          <div class="text-3xl font-bold text-teal-400 font-mono mb-1">98.20%</div>
-          <div class="text-xs text-on-surface/60 uppercase tracking-widest">Accuracy</div>
-          <div class="text-xs text-on-surface/40 mt-1">target ≥ 98% ✓</div>
-        </div>
-        <div class="rounded-2xl p-5 border border-amber-500/20 bg-amber-500/5 text-center">
-          <div class="text-3xl font-bold text-amber-400 font-mono mb-1">91.40%</div>
-          <div class="text-xs text-on-surface/60 uppercase tracking-widest">Macro F1</div>
-          <div class="text-xs text-on-surface/40 mt-1">target ≥ 93% — close</div>
-        </div>
-        <div class="rounded-2xl p-5 border border-violet-500/20 bg-violet-500/5 text-center">
-          <div class="text-3xl font-bold text-violet-400 font-mono mb-1">98.23%</div>
-          <div class="text-xs text-on-surface/60 uppercase tracking-widest">Weighted F1</div>
-          <div class="text-xs text-on-surface/40 mt-1">imbalance-adjusted</div>
-        </div>
-        <div class="rounded-2xl p-5 border border-sky-500/20 bg-sky-500/5 text-center">
-          <div class="text-3xl font-bold text-sky-400 font-mono mb-1">98.92%</div>
-          <div class="text-xs text-on-surface/60 uppercase tracking-widest">Mean ROC-AUC</div>
-          <div class="text-xs text-on-surface/40 mt-1">one-vs-rest, 5 classes</div>
-        </div>
-      </div>
-
-      <!-- Per-class F1 chart -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-        Per-Class Precision · Recall · F1 — Test Set
-      </p>
-      <div class="h-[280px] bg-slate-950/50 rounded-2xl p-4 border border-white/5 mb-3">
-        <canvas id="perClassF1Chart"></canvas>
-      </div>
-      <p class="body-text text-sm mb-8">
-        Supraventricular (S) and Fusion (F) are the hardest classes despite SMOTE augmentation — both have subtle or hybrid
-        morphology and together represent only 3.2% of training samples. Normal and Unknown achieve near-perfect F1
-        because they have either dominant frequency or highly consistent waveform signatures.
-      </p>
-
-      <!-- Training convergence + multi-optimizer -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-3">
-        <div>
-          <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-            Adam Training Curve — Val F1 over 100 Epochs
-          </p>
-          <div class="h-[260px] bg-slate-950/50 rounded-2xl p-4 border border-white/5">
-            <canvas id="convergenceChart"></canvas>
-          </div>
-        </div>
-        <div>
-          <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-            All Optimizers — Validation F1 Convergence
-          </p>
-          <div class="h-[260px] bg-slate-950/50 rounded-2xl p-4 border border-white/5">
-            <canvas id="multiOptChart"></canvas>
+          <!-- ECG Signal Visualization -->
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Representative Normal ECG Beat — 187 samples @ 360 Hz (~0.52 s)
+            </p>
+            <div class="chart-container h-[160px] relative">
+              <canvas id="ecgDemoChart" class="w-full h-full relative z-10"></canvas>
+            </div>
+            <div class="flex gap-6 mt-2">
+              <span class="text-[10px] font-mono text-green-400/70 flex items-center gap-1.5">
+                <span class="w-2 h-1 inline-block bg-green-500/30 border border-green-500/50"></span>P-wave (10–30)
+              </span>
+              <span class="text-[10px] font-mono text-red-400/70 flex items-center gap-1.5">
+                <span class="w-2 h-1 inline-block bg-red-500/30 border border-red-500/50"></span>QRS complex (50–80)
+              </span>
+              <span class="text-[10px] font-mono text-blue-400/70 flex items-center gap-1.5">
+                <span class="w-2 h-1 inline-block bg-blue-500/30 border border-blue-500/50"></span>T-wave (90–130)
+              </span>
+            </div>
           </div>
         </div>
       </div>
-      <p class="body-text text-sm mb-8">
-        Adam converges noisily — it explores broadly for 60 epochs before stabilising above 0.90.
-        SGD+Momentum reaches its peak earlier (epoch 33) and is the <em>best optimizer by val F1</em>
-        (0.9217), contradicting the common assumption that Adam always wins on deep learning tasks.
-        RMSProp is the most unstable, with variance spikes throughout training.
-      </p>
 
-      <!-- Actual optimizer bar -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-        Best Val Macro F1 Achieved — Per Optimizer (Actual)
-      </p>
-      <div class="h-[320px] bg-slate-950/50 rounded-2xl p-4 border border-white/5 mb-3">
-        <canvas id="actualOptimizerChart"></canvas>
-      </div>
-      <p class="body-text text-sm mb-8">
-        SGD+Momentum outperforms Adam on this dataset. This is likely because CosineAnnealingLR
-        favours optimizers that tolerate larger learning-rate swings — SGD+Momentum rides the cosine
-        restarts more aggressively, escaping local minima that stall Adam's adaptive steps.
-        The practical takeaway: <strong class="text-teal-400">adaptive optimizers are not universally superior</strong>;
-        scheduling strategy and dataset size both mediate the outcome.
-      </p>
-
-      <!-- Confusion matrix + ROC curves -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-3">
-        <div>
-          <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-            Confusion Matrix — Test Set (ResNet1D + Adam)
+      <!-- ── 2. Dataset ────────────────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Dataset</h2>
+        </div>
+        <div class="p-6 flex flex-col gap-5">
+          <p class="body-text">
+            Primary dataset: <strong>MIT-BIH Arrhythmia Database</strong> (Moody &amp; Mark, 2001) —
+            48 half-hour two-lead Holter recordings from 47 subjects, sampled at <strong>360 Hz</strong>.
+            Each heartbeat is segmented into a fixed 187-sample window centred on the R-peak.
+            Secondary dataset: <strong>PTB Diagnostic ECG DB</strong> used in notebook 08 for
+            binary generalisation testing (healthy vs. myocardial infarction).
           </p>
-          <div class="rounded-2xl overflow-hidden border border-white/5 bg-slate-950/50">
-            <img src="/results/plots/confusion_matrices/confusion_matrix.png"
-                 alt="Confusion Matrix" class="w-full h-auto" loading="lazy" />
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Class</th><th>Label</th><th>Description</th><th>Count</th><th>% of total</th><th>Challenge</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="highlight">0 — N</td><td>Normal</td><td>Normal sinus rhythm</td><td>90,589</td><td class="highlight">82.8%</td><td>Dominant class</td></tr>
+                <tr><td>1 — S</td><td>Supraventricular</td><td>Ectopic, narrow QRS</td><td>2,779</td><td>2.5%</td><td>Subtle P-wave changes</td></tr>
+                <tr><td>2 — V</td><td>Ventricular</td><td>PVC, wide bizarre QRS</td><td>7,236</td><td>6.6%</td><td>Morphologically distinct</td></tr>
+                <tr><td class="warn">3 — F</td><td>Fusion</td><td>N + V hybrid beat</td><td>803</td><td class="warn">0.7%</td><td>Rarest · hardest to separate</td></tr>
+                <tr><td>4 — Q</td><td>Unknown / Paced</td><td>Paced or unclassifiable</td><td>8,039</td><td>7.3%</td><td>High morphological variability</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="body-text">
+            The extreme imbalance (Normal 83% vs. Fusion 0.7%) motivates two specific design choices:
+            <strong>Focal Loss</strong> to down-weight easy negatives during training, and
+            <strong>SMOTE</strong> oversampling applied exclusively to the training split to prevent
+            data leakage into validation.
+          </p>
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Class Distribution — MIT-BIH (109,446 beats)
+            </p>
+            <div class="chart-container h-[200px]">
+              <canvas id="classDistChart"></canvas>
+            </div>
           </div>
         </div>
-        <div>
-          <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-            ROC Curves — One-vs-Rest, All 5 Classes
-          </p>
-          <div class="rounded-2xl overflow-hidden border border-white/5 bg-slate-950/50">
-            <img src="/results/plots/roc_curves/roc_all_classes.png"
-                 alt="ROC Curves" class="w-full h-auto" loading="lazy" />
-          </div>
-        </div>
       </div>
-      <p class="body-text text-sm mb-8">
-        The confusion matrix confirms the model's primary failure mode: S beats misclassified as N.
-        This is clinically meaningful — supraventricular ectopics (premature atrial contractions)
-        can appear morphologically similar to normal sinus rhythm if the P-wave alteration is subtle.
-        All 5 ROC curves cluster above 0.97 AUC, demonstrating that the model has strong discriminative
-        power even for minority classes.
-      </p>
 
-      <!-- PTB-DB generalisation -->
-      <p class="text-xs font-mono text-teal-400/60 uppercase tracking-widest mb-3">
-        Cross-Dataset Generalisation — PTB Diagnostic ECG Database
-      </p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-3">
-        <div class="rounded-2xl overflow-hidden border border-white/5 bg-slate-950/50">
-          <img src="/results/plots/ptbdb_roc_curve.png"
-               alt="PTB-DB ROC Curve" class="w-full h-auto" loading="lazy" />
+      <!-- ── 3. Preprocessing Pipeline ────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Preprocessing Pipeline</h2>
         </div>
-        <div class="flex flex-col justify-center gap-4">
-          <div class="rounded-2xl p-5 border border-teal-500/20 bg-teal-500/5 text-center">
-            <div class="text-3xl font-bold text-teal-400 font-mono mb-1">99.64%</div>
-            <div class="text-xs text-on-surface/60 uppercase tracking-widest">PTB-DB F1</div>
-            <div class="text-xs text-on-surface/40 mt-1">Healthy vs. Myocardial Infarction</div>
+        <div class="p-6 flex flex-col gap-4">
+          <p class="body-text">
+            All preprocessing is implemented in <code>src/data/preprocessor.py</code>.
+            The pipeline runs on the training split only; the test split receives only Z-score
+            normalisation to prevent leakage.
+          </p>
+          <div class="arch-block">
+            <span class="layer">Raw CSV (187 values/row, integer amplitude)</span><br>
+            <span class="arrow">  ↓  Z-score normalise</span>   <span class="note">per-sample: (x - μ) / σ — removes patient-level amplitude differences</span><br>
+            <span class="arrow">  ↓  IQR outlier removal</span> <span class="note">eliminates Holter digitisation artefacts (|z| &gt; 3 IQR)</span><br>
+            <span class="arrow">  ↓  Stratified 85/15 split</span> <span class="note">preserves class ratios in train and val</span><br>
+            <span class="arrow">  ↓  SMOTE (train only)</span>  <span class="note">synthetic minority oversampling — balances class counts</span><br>
+            <span class="arrow">  ↓  Reshape → (N, 1, 187)</span> <span class="note">PyTorch Conv1d format: (batch, channels, length)</span>
           </div>
-          <p class="body-text text-sm">
-            The model was fine-tuned on PTB Diagnostic ECG DB (binary classification: healthy vs. MI).
-            Achieving 99.64% F1 on an entirely different dataset validates that the deep residual
-            features learnt on MIT-BIH (rhythm-based arrhythmias) generalise to morphology-based
-            pathology detection — the network is capturing fundamental ECG structure, not dataset-
-            specific artefacts.
+          <p class="body-text">
+            Per-sample Z-score normalisation is particularly important for this task because
+            ECG amplitude varies across patients and recording conditions. Using population-level
+            statistics would introduce data leakage and reduce generalisation. At inference time,
+            the same per-sample normalisation is applied — no stored training statistics are required.
           </p>
         </div>
       </div>
-    </div>
 
-    <!-- ── 10. Notebook Pipeline ──────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-5">Notebook Pipeline</h2>
-      <p class="body-text mb-5">
-        Each notebook is self-contained but builds on outputs from the previous one.
-        Run in sequence from the project root.
-      </p>
-      <div class="space-y-3">
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">01</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">01_eda.ipynb — Exploratory Data Analysis</p>
-          <p class="body-text text-xs">Class distribution, waveform morphology, amplitude statistics. Saves <code>reference_waveforms.npz</code> used by the app.</p></div>
+      <!-- ── 4. Model Architecture ─────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Model Architecture — 1D ResNet</h2>
         </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">02</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">02_preprocessing.ipynb — Data Pipeline</p>
-          <p class="body-text text-xs">Z-score normalisation, IQR filtering, stratified split, SMOTE. Validates no leakage between splits.</p></div>
-        </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">03</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">03_baseline_cnn.ipynb — Baseline Model</p>
-          <p class="body-text text-xs">3-layer CNN trained with Adam. Establishes a lower-bound performance benchmark for the optimizer comparison.</p></div>
-        </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">04</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">04_resnet_training.ipynb — Primary Model</p>
-          <p class="body-text text-xs">Full ResNet1D training with Adam. Saves <code>resnet1d_adam_best.pth</code> — required by the web app.</p></div>
-        </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">05</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">05_optimizer_comparison.ipynb — Optimizer Study</p>
-          <p class="body-text text-xs">Trains SGD / SGD+M / Adagrad / RMSProp / Adam through identical Trainer loop. Plots convergence curves and per-class F1.</p></div>
-        </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">06</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">06_evaluation.ipynb — Full Evaluation</p>
-          <p class="body-text text-xs">Confusion matrix, per-class F1, ROC-AUC curves, full classification report on the held-out test set.</p></div>
-        </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">07</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">07_gradcam_explainability.ipynb — Explainability</p>
-          <p class="body-text text-xs">1 correct + 1 misclassified Grad-CAM example per class (10 plots total). Clinical verification of attended ECG regions.</p></div>
-        </div>
-        <div class="flex gap-4 items-start p-4 rounded-xl bg-white/3 border border-white/5">
-          <span class="pill bg-teal-500/15 text-teal-400 border border-teal-500/20 flex-shrink-0 mt-0.5">08</span>
-          <div><p class="text-sm font-semibold text-on-surface mb-0.5">08_ptbdb_generalisation.ipynb — Generalisation</p>
-          <p class="body-text text-xs">Tests model on PTB Diagnostic ECG DB (binary: healthy vs. MI). Validates that features learnt on MIT-BIH transfer across datasets.</p></div>
+        <div class="p-6 flex flex-col gap-4">
+          <p class="body-text">
+            The primary model (<code>src/models/resnet1d.py</code>) is a 1D Residual Network
+            adapted from He et al. (2016) for time-series classification. Residual connections
+            allow gradient flow through deep networks and prevent vanishing gradients during
+            training with Adam's adaptive updates.
+            Total parameters: <strong>~790,000</strong>.
+          </p>
+          <div class="arch-block">
+            <span class="layer">Input: (batch, 1, 187)</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">Stem: Conv1d(1→32, k=7, s=1) → BN → ReLU</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">layer1: ResidualBlock(32, s=1) × 2</span>     <span class="note">  low-level: P-wave &amp; QRS shape</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">layer2: ResidualBlock(64, s=2) × 2</span>     <span class="note">  mid-level: beat intervals, rhythm</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">layer3: ResidualBlock(128, s=2) × 2</span>    <span class="note">  high-level: arrhythmia class patterns</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">Global Average Pooling (temporal dim)</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">Dense(128) → ReLU → Dropout(0.4)</span><br>
+            <span class="arrow">  ↓  </span><span class="layer">Dense(5) → Softmax</span>
+          </div>
+          <p class="body-text">
+            Each <code>ResidualBlock</code> follows the pattern:
+            Conv1d → BN → ReLU → Conv1d → BN → (+skip connection) → ReLU.
+            Stride-2 blocks use a 1×1 projection shortcut to match dimensions.
+            The Grad-CAM target layer is <code>layer3[-1].conv2</code>, exposed via
+            <code>model.get_gradcam_target_layer()</code>.
+          </p>
+          <p class="body-text">
+            <strong>Baseline for comparison:</strong> a 3-block 1D CNN (<code>src/models/baseline_cnn.py</code>)
+            with no residual connections, used only in the optimizer comparison study to ensure
+            architecture complexity does not confound optimizer performance differences.
+          </p>
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-3">
+              Network Architecture — Visual Overview
+            </p>
+            <div id="archVisual" class="flex flex-col gap-0"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ── 11. References ────────────────────────────────────────────────────── -->
-    <div class="glass-panel rounded-3xl p-8">
-      <h2 class="section-title mb-6">References</h2>
-      <div class="space-y-1">
-        <div class="ref-item">
-          <strong>[1]</strong> Kingma, D. P., &amp; Ba, J. (2015). Adam: A Method for Stochastic Optimization.
-          <em>ICLR 2015</em>. arXiv:1412.6980.
+      <!-- ── 5. Training Setup ──────────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Training Setup</h2>
         </div>
-        <div class="ref-item">
-          <strong>[2]</strong> Moody, G. B., &amp; Mark, R. G. (2001). The impact of the MIT-BIH Arrhythmia Database.
-          <em>IEEE Engineering in Medicine and Biology</em>, 20(3), 45–50.
-        </div>
-        <div class="ref-item">
-          <strong>[3]</strong> Lin, T. Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017).
-          Focal Loss for Dense Object Detection. <em>IEEE ICCV</em>. arXiv:1708.02002.
-        </div>
-        <div class="ref-item">
-          <strong>[4]</strong> He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual Learning for Image Recognition.
-          <em>IEEE CVPR</em>. arXiv:1512.03385.
-        </div>
-        <div class="ref-item">
-          <strong>[5]</strong> Chawla, N. V., Bowyer, K. W., Hall, L. O., &amp; Kegelmeyer, W. P. (2002).
-          SMOTE: Synthetic Minority Over-sampling Technique. <em>JAIR</em>, 16, 321–357.
-        </div>
-        <div class="ref-item">
-          <strong>[6]</strong> Selvaraju, R. R., et al. (2017). Grad-CAM: Visual Explanations from Deep Networks
-          via Gradient-based Localization. <em>IEEE ICCV</em>. arXiv:1610.02391.
-        </div>
-        <div class="ref-item">
-          <strong>[7]</strong> Kokhlikyan, N., et al. (2020). Captum: A unified and generic model interpretability
-          library for PyTorch. arXiv:2009.07896.
+        <div class="p-6 flex flex-col gap-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+                Adam Hyperparameters (paper defaults)
+              </p>
+              <table class="data-table">
+                <thead><tr><th>Parameter</th><th>Value</th><th>Source</th></tr></thead>
+                <tbody>
+                  <tr><td>Learning rate α</td><td class="highlight">0.001</td><td>Algorithm 1</td></tr>
+                  <tr><td>β₁ (1st moment)</td><td class="highlight">0.9</td><td>Algorithm 1</td></tr>
+                  <tr><td>β₂ (2nd moment)</td><td class="highlight">0.999</td><td>Algorithm 1</td></tr>
+                  <tr><td>ε (numerical stab.)</td><td>1e-8</td><td>Algorithm 1</td></tr>
+                  <tr><td>Weight decay</td><td>0</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+                Training Configuration
+              </p>
+              <table class="data-table">
+                <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+                <tbody>
+                  <tr><td>Batch size</td><td class="highlight">128</td></tr>
+                  <tr><td>Max epochs</td><td>100</td></tr>
+                  <tr><td>Early stopping</td><td>patience = 15 (val macro F1)</td></tr>
+                  <tr><td>LR schedule</td><td>CosineAnnealingLR (T_max=100)</td></tr>
+                  <tr><td>Focal Loss γ</td><td class="highlight">2.0</td></tr>
+                  <tr><td>Focal Loss α</td><td>inverse class frequency</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p class="body-text">
+            <strong>Focal Loss</strong> (Lin et al., 2017): FL(pₜ) = −αₜ · (1−pₜ)^γ · log(pₜ).
+            The modulating factor (1−pₜ)^γ reduces the loss contribution of well-classified easy examples,
+            forcing the model to focus on hard minority-class beats. With γ=2.0, a sample classified with
+            90% confidence contributes only 1% of the cross-entropy loss.
+          </p>
+          <p class="body-text">
+            <strong>Early stopping</strong> monitors <em>validation macro F1</em> rather than accuracy,
+            because accuracy is misleading under class imbalance — a model predicting only "Normal"
+            achieves 83% accuracy while being clinically useless.
+          </p>
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Focal Loss vs. Cross-Entropy — Effect of Modulating Factor (1−pₜ)^γ
+            </p>
+            <div class="chart-container h-[210px]">
+              <canvas id="focalLossChart"></canvas>
+            </div>
+            <p class="text-[10px] font-mono text-outline mt-2">
+              At p=0.9 (confident prediction): CE loss ≈ 0.105 · FL(γ=2) ≈ 0.001 — 99% reduction forces focus on hard examples.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
 
-  </div><!-- end flex col -->
-</main>
+      <!-- ── 6. Optimizer Comparison ───────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Optimizer Comparison Study</h2>
+        </div>
+        <div class="p-6 flex flex-col gap-5">
+          <p class="body-text">
+            Five optimizers are trained through the identical <code>Trainer</code> loop
+            (<code>src/optimizers/comparison.py</code>) on the same data split and random seed.
+            Predictions from the Adam paper (§4, §5, §6) are verified empirically.
+          </p>
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Optimizer</th><th>Adam Paper Prediction</th><th>Expected Macro F1</th><th>Why</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>SGD (vanilla)</td>
+                  <td>Stalls on sparse minority gradients (§6.1)</td>
+                  <td class="warn">~72%</td>
+                  <td>No adaptation — Fusion &amp; SVE nearly invisible</td>
+                </tr>
+                <tr>
+                  <td>SGD + Momentum</td>
+                  <td>Faster but no per-parameter adaptation (§5)</td>
+                  <td class="warn">~73%</td>
+                  <td>Momentum helps convergence speed, not minority classes</td>
+                </tr>
+                <tr>
+                  <td>Adagrad</td>
+                  <td>Monotonically decaying LR stalls late (§5)</td>
+                  <td>~78%</td>
+                  <td>LR → 0 prevents recovery from early suboptimal states</td>
+                </tr>
+                <tr>
+                  <td>RMSProp</td>
+                  <td>Diverges without bias correction (§6.4)</td>
+                  <td>~84%</td>
+                  <td>Lacks bias correction → unstable early training</td>
+                </tr>
+                <tr>
+                  <td class="highlight">Adam</td>
+                  <td class="highlight">O(√T) regret · all advantages combined (§4)</td>
+                  <td class="highlight">≥93%</td>
+                  <td>Adaptive LR + bias correction + momentum</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="body-text">
+            The sparse gradient problem (§6.1) is particularly relevant here: the Fusion class
+            (0.7%) produces gradients only in 7 of every 1000 batches on average.
+            Adam's bias-corrected running averages ensure these rare gradients are not drowned out,
+            whereas vanilla SGD effectively ignores them.
+          </p>
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Expected Macro F1 by Optimizer — Adam Paper Predictions (§4, §5, §6.1, §6.4)
+            </p>
+            <div class="chart-container h-[320px]">
+              <canvas id="optimizerChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 7. Grad-CAM Explainability ────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Grad-CAM Explainability</h2>
+        </div>
+        <div class="p-6 flex flex-col gap-5">
+          <p class="body-text">
+            Gradient-weighted Class Activation Mapping is implemented via
+            <strong>Captum</strong>'s <code>LayerGradCam</code> targeting
+            <code>model.layer3[-1].conv2</code> — the final convolutional layer before global
+            average pooling, where the highest-level feature representations are formed.
+          </p>
+          <div class="arch-block">
+            <span class="arrow">1. </span><span class="layer">Forward pass: input (1, 1, 187) → predicted class score</span><br>
+            <span class="arrow">2. </span><span class="layer">Backprop gradients to layer3[-1].conv2 feature maps</span><br>
+            <span class="arrow">3. </span><span class="layer">Global-average gradients over temporal dim → channel weights αₖ</span><br>
+            <span class="arrow">4. </span><span class="layer">Weighted sum of activation maps → 1D CAM (length L')</span><br>
+            <span class="arrow">5. </span><span class="layer">ReLU → keep only positive contributions</span><br>
+            <span class="arrow">6. </span><span class="layer">Linear interpolation upsample → length 187</span><br>
+            <span class="arrow">7. </span><span class="layer">Normalise to [0, 1] · overlay on raw signal (RdYlBu_r colormap)</span>
+          </div>
+          <p class="body-text"><strong>Clinical verification criteria:</strong></p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 bg-surface-container border border-outline-variant/20 border-l-2 border-l-secondary">
+              <p class="text-[9px] font-mono text-secondary uppercase tracking-widest mb-2">Class S — Supraventricular</p>
+              <p class="body-text text-sm">
+                Heatmap should peak at <strong>P-wave region (samples 10–30)</strong>.
+                Supraventricular arrhythmias originate above the ventricles; the diagnostic
+                signal is the abnormal P-wave morphology preceding the (narrow) QRS complex.
+              </p>
+            </div>
+            <div class="p-4 bg-surface-container border border-outline-variant/20 border-l-2 border-l-error">
+              <p class="text-[9px] font-mono text-error uppercase tracking-widest mb-2">Class V — Ventricular</p>
+              <p class="body-text text-sm">
+                Heatmap should peak at <strong>QRS complex (samples 50–80)</strong>.
+                Ventricular ectopic beats are characterised by a wide, bizarre QRS produced
+                by aberrant ventricular depolarisation — the defining morphological feature.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 8. Expected Results ───────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Expected Results</h2>
+        </div>
+        <div class="p-6 flex flex-col gap-5">
+          <p class="body-text">
+            Target performance on the held-out MIT-BIH test set (15% stratified split):
+          </p>
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr><th>Class</th><th>Arrhythmia</th><th>Dataset %</th><th>Expected F1</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0 — N</td><td>Normal</td><td>82.8%</td><td class="highlight">~99%</td><td>Dominant class, easy to learn</td></tr>
+                <tr><td>1 — S</td><td>Supraventricular</td><td>2.5%</td><td>~88%</td><td>Subtle P-wave changes</td></tr>
+                <tr><td>2 — V</td><td>Ventricular</td><td>6.6%</td><td class="highlight">~95%</td><td>Distinct morphology</td></tr>
+                <tr><td class="warn">3 — F</td><td>Fusion Beat</td><td class="warn">0.7%</td><td class="warn">~82%</td><td>Rarest · SMOTE critical here</td></tr>
+                <tr><td>4 — Q</td><td>Unknown / Paced</td><td>7.3%</td><td>~91%</td><td>Variable morphology</td></tr>
+                <tr style="background:rgba(255,83,87,0.04)">
+                  <td class="highlight">Overall</td><td>—</td><td>—</td>
+                  <td class="highlight">≥98% acc · ≥93% macro F1</td>
+                  <td>Adam vs SGD gap: ~21% macro F1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="body-text">
+            The large Adam vs. SGD performance gap on macro F1 (predicted ~21 percentage points)
+            is the primary empirical finding. Accuracy alone would not reveal this — both SGD and Adam
+            achieve high accuracy by correctly classifying the dominant Normal class, but only Adam
+            successfully learns the rare minority classes.
+          </p>
+        </div>
+      </div>
+
+      <!-- ── 9. Achieved Results ───────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Achieved Results
+            <span class="w-1.5 h-1.5 bg-[#FF0033] animate-pulse inline-block ml-1 align-middle"></span>
+          </h2>
+        </div>
+        <div class="p-6 flex flex-col gap-6">
+          <p class="body-text">
+            Final evaluation on the held-out MIT-BIH test set (15% stratified split, ~16,000 samples).
+            The model was trained with Adam + CosineAnnealingLR for 100 epochs; the best checkpoint
+            (epoch 98, val macro F1 = 0.9075) was evaluated once on the unseen test set.
+          </p>
+
+          <!-- Overall metric cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-outline-variant/10">
+            <div class="metric-card border-t-2 border-t-[#6ed4f1]">
+              <div class="text-3xl font-bold text-[#6ed4f1] font-mono mb-1">98.20%</div>
+              <div class="text-[9px] font-mono text-outline uppercase tracking-widest">Accuracy</div>
+              <div class="text-[9px] font-mono text-outline mt-1">target ≥ 98% ✓</div>
+            </div>
+            <div class="metric-card border-t-2 border-t-amber-400">
+              <div class="text-3xl font-bold text-amber-400 font-mono mb-1">91.40%</div>
+              <div class="text-[9px] font-mono text-outline uppercase tracking-widest">Macro F1</div>
+              <div class="text-[9px] font-mono text-outline mt-1">target ≥ 93% — close</div>
+            </div>
+            <div class="metric-card border-t-2 border-t-violet-400">
+              <div class="text-3xl font-bold text-violet-400 font-mono mb-1">98.23%</div>
+              <div class="text-[9px] font-mono text-outline uppercase tracking-widest">Weighted F1</div>
+              <div class="text-[9px] font-mono text-outline mt-1">imbalance-adjusted</div>
+            </div>
+            <div class="metric-card border-t-2 border-t-sky-400">
+              <div class="text-3xl font-bold text-sky-400 font-mono mb-1">98.92%</div>
+              <div class="text-[9px] font-mono text-outline uppercase tracking-widest">Mean ROC-AUC</div>
+              <div class="text-[9px] font-mono text-outline mt-1">one-vs-rest, 5 classes</div>
+            </div>
+          </div>
+
+          <!-- Per-class F1 chart -->
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Per-Class Precision · Recall · F1 — Test Set
+            </p>
+            <div class="chart-container h-[250px]">
+              <canvas id="perClassF1Chart"></canvas>
+            </div>
+          </div>
+          <p class="body-text">
+            Supraventricular (S) and Fusion (F) are the hardest classes despite SMOTE augmentation — both have subtle or hybrid
+            morphology and together represent only 3.2% of training samples. Normal and Unknown achieve near-perfect F1
+            because they have either dominant frequency or highly consistent waveform signatures.
+          </p>
+
+          <!-- Training convergence + multi-optimizer -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+                Adam Training Curve — Val F1 over 100 Epochs
+              </p>
+              <div class="chart-container h-[240px]">
+                <canvas id="convergenceChart"></canvas>
+              </div>
+            </div>
+            <div>
+              <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+                All Optimizers — Validation F1 Convergence
+              </p>
+              <div class="chart-container h-[240px]">
+                <canvas id="multiOptChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <p class="body-text">
+            Adam converges noisily — it explores broadly for 60 epochs before stabilising above 0.90.
+            SGD+Momentum reaches its peak earlier (epoch 33) and is the <em>best optimizer by val F1</em>
+            (0.9217), contradicting the common assumption that Adam always wins on deep learning tasks.
+            RMSProp is the most unstable, with variance spikes throughout training.
+          </p>
+
+          <!-- Actual optimizer bar -->
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Best Val Macro F1 Achieved — Per Optimizer (Actual)
+            </p>
+            <div class="chart-container h-[280px]">
+              <canvas id="actualOptimizerChart"></canvas>
+            </div>
+          </div>
+          <p class="body-text">
+            SGD+Momentum outperforms Adam on this dataset. This is likely because CosineAnnealingLR
+            favours optimizers that tolerate larger learning-rate swings — SGD+Momentum rides the cosine
+            restarts more aggressively, escaping local minima that stall Adam's adaptive steps.
+            The practical takeaway: <strong style="color:#ffb3af">adaptive optimizers are not universally superior</strong>;
+            scheduling strategy and dataset size both mediate the outcome.
+          </p>
+
+          <!-- Confusion matrix + ROC curves -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+                Confusion Matrix — Test Set (ResNet1D + Adam)
+              </p>
+              <div class="overflow-hidden border border-outline-variant/15 bg-[#0e0e0e] cursor-zoom-in">
+                <img src="/results/plots/confusion_matrices/confusion_matrix.png"
+                     alt="Confusion Matrix" class="w-full h-auto" loading="lazy" />
+              </div>
+            </div>
+            <div>
+              <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+                ROC Curves — One-vs-Rest, All 5 Classes
+              </p>
+              <div class="overflow-hidden border border-outline-variant/15 bg-[#0e0e0e] cursor-zoom-in">
+                <img src="/results/plots/roc_curves/roc_all_classes.png"
+                     alt="ROC Curves" class="w-full h-auto" loading="lazy" />
+              </div>
+            </div>
+          </div>
+          <p class="body-text">
+            The confusion matrix confirms the model's primary failure mode: S beats misclassified as N.
+            This is clinically meaningful — supraventricular ectopics (premature atrial contractions)
+            can appear morphologically similar to normal sinus rhythm if the P-wave alteration is subtle.
+            All 5 ROC curves cluster above 0.97 AUC, demonstrating that the model has strong discriminative
+            power even for minority classes.
+          </p>
+
+          <!-- PTB-DB generalisation -->
+          <div>
+            <p class="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-2">
+              Cross-Dataset Generalisation — PTB Diagnostic ECG Database
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="overflow-hidden border border-outline-variant/15 bg-[#0e0e0e] cursor-zoom-in">
+                <img src="/results/plots/ptbdb_roc_curve.png"
+                     alt="PTB-DB ROC Curve" class="w-full h-auto" loading="lazy" />
+              </div>
+              <div class="flex flex-col justify-center gap-4">
+                <div class="metric-card border-t-2 border-t-[#6ed4f1]">
+                  <div class="text-3xl font-bold text-[#6ed4f1] font-mono mb-1">99.64%</div>
+                  <div class="text-[9px] font-mono text-outline uppercase tracking-widest">PTB-DB F1</div>
+                  <div class="text-[9px] font-mono text-outline mt-1">Healthy vs. Myocardial Infarction</div>
+                </div>
+                <p class="body-text text-sm">
+                  The model was fine-tuned on PTB Diagnostic ECG DB (binary classification: healthy vs. MI).
+                  Achieving 99.64% F1 on an entirely different dataset validates that the deep residual
+                  features learnt on MIT-BIH (rhythm-based arrhythmias) generalise to morphology-based
+                  pathology detection — the network is capturing fundamental ECG structure, not dataset-
+                  specific artefacts.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── 10. Notebook Pipeline ──────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">Notebook Pipeline</h2>
+        </div>
+        <div class="p-6 flex flex-col gap-3">
+          <p class="body-text mb-2">
+            Each notebook is self-contained but builds on outputs from the previous one.
+            Run in sequence from the project root.
+          </p>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">01</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">01_eda.ipynb — Exploratory Data Analysis</p>
+            <p class="body-text text-xs">Class distribution, waveform morphology, amplitude statistics. Saves <code>reference_waveforms.npz</code> used by the app.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">02</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">02_preprocessing.ipynb — Data Pipeline</p>
+            <p class="body-text text-xs">Z-score normalisation, IQR filtering, stratified split, SMOTE. Validates no leakage between splits.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">03</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">03_baseline_cnn.ipynb — Baseline Model</p>
+            <p class="body-text text-xs">3-layer CNN trained with Adam. Establishes a lower-bound performance benchmark for the optimizer comparison.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">04</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">04_resnet_training.ipynb — Primary Model</p>
+            <p class="body-text text-xs">Full ResNet1D training with Adam. Saves <code>resnet1d_adam_best.pth</code> — required by the web app.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">05</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">05_optimizer_comparison.ipynb — Optimizer Study</p>
+            <p class="body-text text-xs">Trains SGD / SGD+M / Adagrad / RMSProp / Adam through identical Trainer loop. Plots convergence curves and per-class F1.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">06</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">06_evaluation.ipynb — Full Evaluation</p>
+            <p class="body-text text-xs">Confusion matrix, per-class F1, ROC-AUC curves, full classification report on the held-out test set.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">07</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">07_gradcam_explainability.ipynb — Explainability</p>
+            <p class="body-text text-xs">1 correct + 1 misclassified Grad-CAM example per class (10 plots total). Clinical verification of attended ECG regions.</p></div>
+          </div>
+          <div class="nb-step">
+            <span class="pill bg-[#FF5357]/10 text-primary border border-[#FF5357]/20 flex-shrink-0 mt-0.5">08</span>
+            <div><p class="text-sm font-semibold text-on-surface mb-0.5">08_ptbdb_generalisation.ipynb — Generalisation</p>
+            <p class="body-text text-xs">Tests model on PTB Diagnostic ECG DB (binary: healthy vs. MI). Validates that features learnt on MIT-BIH transfer across datasets.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 11. References ────────────────────────────────────────────────────── -->
+      <div class="cmd-panel">
+        <div class="cmd-panel-header">
+          <h2 class="section-title">References</h2>
+        </div>
+        <div class="p-6">
+          <div class="ref-item">
+            <strong>[1]</strong> Kingma, D. P., &amp; Ba, J. (2015). Adam: A Method for Stochastic Optimization.
+            <em>ICLR 2015</em>. arXiv:1412.6980.
+          </div>
+          <div class="ref-item">
+            <strong>[2]</strong> Moody, G. B., &amp; Mark, R. G. (2001). The impact of the MIT-BIH Arrhythmia Database.
+            <em>IEEE Engineering in Medicine and Biology</em>, 20(3), 45–50.
+          </div>
+          <div class="ref-item">
+            <strong>[3]</strong> Lin, T. Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017).
+            Focal Loss for Dense Object Detection. <em>IEEE ICCV</em>. arXiv:1708.02002.
+          </div>
+          <div class="ref-item">
+            <strong>[4]</strong> He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual Learning for Image Recognition.
+            <em>IEEE CVPR</em>. arXiv:1512.03385.
+          </div>
+          <div class="ref-item">
+            <strong>[5]</strong> Chawla, N. V., Bowyer, K. W., Hall, L. O., &amp; Kegelmeyer, W. P. (2002).
+            SMOTE: Synthetic Minority Over-sampling Technique. <em>JAIR</em>, 16, 321–357.
+          </div>
+          <div class="ref-item">
+            <strong>[6]</strong> Selvaraju, R. R., et al. (2017). Grad-CAM: Visual Explanations from Deep Networks
+            via Gradient-based Localization. <em>IEEE ICCV</em>. arXiv:1610.02391.
+          </div>
+          <div class="ref-item">
+            <strong>[7]</strong> Kokhlikyan, N., et al. (2020). Captum: A unified and generic model interpretability
+            library for PyTorch. arXiv:2009.07896.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end flex col -->
+  </main>
+</div>
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared theme helpers
+// Shared theme helpers — updated to red/obsidian palette
 // ─────────────────────────────────────────────────────────────────────────────
-const TEAL   = '#00f5d4';
-const TEAL20 = 'rgba(0,245,212,0.20)';
-const TEAL08 = 'rgba(0,245,212,0.08)';
-const SLATE  = 'rgba(255,255,255,0.55)';
-const GRID   = 'rgba(255,255,255,0.06)';
-const BG     = '#0e131e';
+const RED    = '#FF5357';
+const RED_DIM= '#ffb3af';
+const RED08  = 'rgba(255,83,87,0.08)';
+const RED20  = 'rgba(255,83,87,0.20)';
+const TEAL   = '#6ed4f1';
+const TEAL08 = 'rgba(110,212,241,0.08)';
+const SLATE  = 'rgba(255,255,255,0.45)';
+const GRID   = 'rgba(255,255,255,0.05)';
 
-Chart.defaults.color      = SLATE;
+Chart.defaults.color       = SLATE;
 Chart.defaults.borderColor = GRID;
 Chart.defaults.font.family = 'Inter, sans-serif';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 1. ECG Demo Chart  (Problem Statement)
+// 1. ECG Demo Chart
 // ─────────────────────────────────────────────────────────────────────────────
 (function () {
-  // Synthetic ECG: baseline + P-wave + QRS spike + T-wave
   function synthECG(n) {
     const sig = new Array(n).fill(0);
     const gauss = (x, mu, sigma, amp) => amp * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
     for (let i = 0; i < n; i++) {
-      sig[i] = gauss(i, 30,  8,  0.20)   // P-wave
-             + gauss(i, 60,  2,  1.00)   // Q dip inverted
-             - gauss(i, 65,  1,  0.25)   // Q
-             + gauss(i, 70,  2,  2.50)   // R peak
-             - gauss(i, 75,  1,  0.30)   // S
-             + gauss(i, 105, 9,  0.50)   // T-wave
-             + (Math.random() - 0.5) * 0.04; // noise
+      sig[i] = gauss(i, 30,  8,  0.20)
+             + gauss(i, 60,  2,  1.00)
+             - gauss(i, 65,  1,  0.25)
+             + gauss(i, 70,  2,  2.50)
+             - gauss(i, 75,  1,  0.30)
+             + gauss(i, 105, 9,  0.50)
+             + (Math.random() - 0.5) * 0.04;
     }
     return sig;
   }
@@ -873,12 +977,11 @@ Chart.defaults.font.family = 'Inter, sans-serif';
   const sig = synthECG(n);
   const labels = Array.from({length: n}, (_, i) => i);
 
-  // Region shading plugin (same pattern as index.html)
   const shadingPlugin = {
     id: 'ecgShading',
     beforeDraw(chart) {
-      const {ctx, chartArea: {left, right, top, bottom}, scales: {x, y}} = chart;
-      if (!x || !y) return;
+      const {ctx, chartArea: {top, bottom}, scales: {x}} = chart;
+      if (!x) return;
       const regions = [
         {lo: 20, hi: 45,  color: 'rgba(94,234,212,0.07)',  label: 'P'},
         {lo: 55, hi: 90,  color: 'rgba(239,68,68,0.10)',   label: 'QRS'},
@@ -907,11 +1010,11 @@ Chart.defaults.font.family = 'Inter, sans-serif';
       labels,
       datasets: [{
         data: sig,
-        borderColor: TEAL,
+        borderColor: RED,
         borderWidth: 1.5,
         pointRadius: 0,
         tension: 0.3,
-        fill: {target: 'origin', above: TEAL08},
+        fill: {target: 'origin', above: RED08},
       }]
     },
     options: {
@@ -928,7 +1031,7 @@ Chart.defaults.font.family = 'Inter, sans-serif';
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 2. Class Distribution Chart  (Dataset)
+// 2. Class Distribution Chart
 // ─────────────────────────────────────────────────────────────────────────────
 (function () {
   const ctx = document.getElementById('classDistChart');
@@ -938,11 +1041,11 @@ Chart.defaults.font.family = 'Inter, sans-serif';
   const counts = [90589, 2779, 7236, 803, 8039];
   const total  = counts.reduce((a, b) => a + b, 0);
   const colors = [
-    'rgba(0,245,212,0.75)',
-    'rgba(139,92,246,0.75)',
-    'rgba(239,68,68,0.75)',
+    'rgba(110,212,241,0.70)',
+    'rgba(255,179,175,0.75)',
+    'rgba(255,83,87,0.75)',
     'rgba(251,191,36,0.75)',
-    'rgba(99,179,237,0.75)',
+    'rgba(99,179,237,0.65)',
   ];
 
   new Chart(ctx, {
@@ -952,9 +1055,8 @@ Chart.defaults.font.family = 'Inter, sans-serif';
       datasets: [{
         data: counts,
         backgroundColor: colors,
-        borderColor: colors.map(c => c.replace('0.75', '1')),
+        borderColor: colors.map(c => c.replace(/[\d.]+\)$/, '1)')),
         borderWidth: 1,
-        borderRadius: 6,
       }]
     },
     options: {
@@ -970,74 +1072,57 @@ Chart.defaults.font.family = 'Inter, sans-serif';
         }
       },
       scales: {
-        x: {
-          grid: {color: GRID},
-          ticks: {font: {size: 11}, callback: v => v.toLocaleString()},
-          border: {color: GRID},
-        },
-        y: {
-          grid: {display: false},
-          ticks: {font: {size: 12}},
-          border: {color: 'transparent'},
-        }
+        x: { grid: {color: GRID}, ticks: {font: {size: 10}, callback: v => v.toLocaleString()}, border: {color: GRID} },
+        y: { grid: {display: false}, ticks: {font: {size: 11}}, border: {color: 'transparent'} }
       }
     }
   });
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 3. Architecture Visual  (Model Architecture)
+// 3. Architecture Visual
 // ─────────────────────────────────────────────────────────────────────────────
 (function () {
   const el = document.getElementById('archVisual');
   if (!el) return;
 
   const layers = [
-    { label: 'Input',          sub: '1 × 187',            color: 'rgba(99,179,237,0.25)',   border: 'rgba(99,179,237,0.6)'  },
-    { label: 'Stem Conv1d',    sub: '32 filters, k=7',    color: 'rgba(0,245,212,0.15)',    border: 'rgba(0,245,212,0.5)'   },
-    { label: 'ResBlock Layer1',sub: '32 filters, stride 1',color:'rgba(0,245,212,0.12)',    border: 'rgba(0,245,212,0.4)'   },
-    { label: 'ResBlock Layer2',sub: '64 filters, stride 2',color:'rgba(139,92,246,0.15)',   border: 'rgba(139,92,246,0.5)'  },
-    { label: 'ResBlock Layer3',sub: '128 filters, stride 2 ← Grad-CAM target',color:'rgba(239,68,68,0.15)',border:'rgba(239,68,68,0.5)'},
-    { label: 'Global Avg Pool',sub: '128-dim vector',      color: 'rgba(251,191,36,0.12)',  border: 'rgba(251,191,36,0.45)' },
-    { label: 'Dense + ReLU',   sub: '128 units',           color: 'rgba(251,191,36,0.10)',  border: 'rgba(251,191,36,0.35)' },
-    { label: 'Softmax Output', sub: '5 classes',           color: 'rgba(0,245,212,0.20)',   border: 'rgba(0,245,212,0.6)'   },
+    { label: 'Input',          sub: '1 × 187',            color: 'rgba(99,179,237,0.15)',   border: 'rgba(99,179,237,0.5)'  },
+    { label: 'Stem Conv1d',    sub: '32 filters, k=7',    color: 'rgba(110,212,241,0.10)',  border: 'rgba(110,212,241,0.4)' },
+    { label: 'ResBlock Layer1',sub: '32 filters, stride 1',color:'rgba(110,212,241,0.08)',  border: 'rgba(110,212,241,0.3)' },
+    { label: 'ResBlock Layer2',sub: '64 filters, stride 2',color:'rgba(255,179,175,0.10)',  border: 'rgba(255,179,175,0.4)' },
+    { label: 'ResBlock Layer3',sub: '128 filters, stride 2 ← Grad-CAM target',color:'rgba(255,83,87,0.12)',border:'rgba(255,83,87,0.5)'},
+    { label: 'Global Avg Pool',sub: '128-dim vector',      color: 'rgba(251,191,36,0.10)',  border: 'rgba(251,191,36,0.40)' },
+    { label: 'Dense + ReLU',   sub: '128 units',           color: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.30)' },
+    { label: 'Softmax Output', sub: '5 classes',           color: 'rgba(110,212,241,0.15)', border: 'rgba(110,212,241,0.5)' },
   ];
 
   el.innerHTML = layers.map((l, i) => `
     <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
       <div style="
-        width:100%; padding:10px 16px;
+        width:100%; padding:8px 16px;
         background:${l.color}; border:1px solid ${l.border};
-        border-radius:10px; text-align:center;
+        text-align:center;
       ">
-        <div style="font-size:13px;font-weight:600;color:#e2e8f0;">${l.label}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;font-family:'JetBrains Mono',monospace;">${l.sub}</div>
+        <div style="font-size:12px;font-weight:600;color:#e9bcb9;">${l.label}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;font-family:'JetBrains Mono',monospace;">${l.sub}</div>
       </div>
       ${i < layers.length - 1 ? `
-      <div style="
-        width:2px; height:20px;
-        background:linear-gradient(to bottom,${l.border},rgba(255,255,255,0.1));
-        margin:0 auto;
-      "></div>
-      <div style="
-        width:8px; height:8px; border-radius:50%;
-        background:${layers[i+1].border}; margin:0 auto;
-      "></div>
+      <div style="width:2px;height:14px;background:linear-gradient(to bottom,${l.border},rgba(255,255,255,0.05));margin:0 auto;"></div>
+      <div style="width:6px;height:6px;background:${layers[i+1].border};margin:0 auto;"></div>
       ` : ''}
     </div>
   `).join('');
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. Focal Loss Curve  (Training Setup)
+// 4. Focal Loss Curve
 // ─────────────────────────────────────────────────────────────────────────────
 (function () {
   const ctx = document.getElementById('focalLossChart');
   if (!ctx) return;
 
-  const ps = [];
-  const ce = [];
-  const fl = [];
+  const ps = [], ce = [], fl = [];
   for (let i = 1; i <= 99; i++) {
     const p = i / 100;
     ps.push(p.toFixed(2));
@@ -1064,11 +1149,11 @@ Chart.defaults.font.family = 'Inter, sans-serif';
         {
           label: 'Focal Loss (γ=2)',
           data: fl,
-          borderColor: TEAL,
+          borderColor: RED,
           borderWidth: 2.5,
           pointRadius: 0,
           tension: 0.4,
-          fill: {target: 'origin', above: TEAL08},
+          fill: {target: 'origin', above: RED08},
         }
       ]
     },
@@ -1076,30 +1161,22 @@ Chart.defaults.font.family = 'Inter, sans-serif';
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: true,
-          labels: { color: SLATE, font: {size: 12}, boxWidth: 20, padding: 16 }
-        },
+        legend: { display: true, labels: { color: SLATE, font: {size: 11}, boxWidth: 16, padding: 14 } },
         tooltip: { mode: 'index', intersect: false }
       },
       scales: {
         x: {
           grid: {color: GRID},
-          ticks: {
-            font: {size: 10, family: 'JetBrains Mono, monospace'},
-            maxTicksLimit: 11,
-            callback: (_, i, ticks) => {
-              const step = Math.floor(ticks.length / 10);
-              return i % step === 0 ? ps[i] : '';
-            }
+          ticks: { font: {size: 10, family: 'JetBrains Mono, monospace'}, maxTicksLimit: 11,
+            callback: (_, i, ticks) => { const step = Math.floor(ticks.length / 10); return i % step === 0 ? ps[i] : ''; }
           },
-          title: { display: true, text: 'Predicted Probability p(correct class)', color: SLATE, font: {size: 12} },
+          title: { display: true, text: 'Predicted Probability p(correct class)', color: SLATE, font: {size: 11} },
           border: {color: GRID},
         },
         y: {
           grid: {color: GRID},
-          ticks: {font: {size: 11}},
-          title: { display: true, text: 'Loss Value', color: SLATE, font: {size: 12} },
+          ticks: {font: {size: 10}},
+          title: { display: true, text: 'Loss Value', color: SLATE, font: {size: 11} },
           border: {color: GRID},
           max: 5,
         }
@@ -1109,53 +1186,44 @@ Chart.defaults.font.family = 'Inter, sans-serif';
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 5. Optimizer Comparison Chart  (Optimizer Comparison)
+// 5. Optimizer Comparison Chart (expected)
 // ─────────────────────────────────────────────────────────────────────────────
 (function () {
   const ctx = document.getElementById('optimizerChart');
   if (!ctx) return;
 
   const labels = ['SGD', 'SGD + Momentum', 'Adagrad', 'RMSProp', 'Adam'];
-  const f1s    = [0.72,  0.73,             0.78,      0.84,      0.93  ];
-  const colors = labels.map(l => l === 'Adam'
-    ? TEAL
-    : 'rgba(100,116,139,0.65)');
-  const borders = labels.map(l => l === 'Adam'
-    ? TEAL
-    : 'rgba(100,116,139,0.9)');
+  const f1s    = [0.72, 0.73, 0.78, 0.84, 0.93];
+  const colors = labels.map(l => l === 'Adam' ? RED : 'rgba(95,62,61,0.65)');
+  const borders = labels.map(l => l === 'Adam' ? RED : 'rgba(95,62,61,0.9)');
 
-  // Glow plugin for Adam bar
   const glowPlugin = {
     id: 'adamGlow',
     afterDatasetDraw(chart) {
-      const {ctx: c, data, chartArea} = chart;
+      const {ctx: c} = chart;
       const meta = chart.getDatasetMeta(0);
       const adamIdx = labels.indexOf('Adam');
       const bar = meta.data[adamIdx];
       c.save();
-      c.shadowColor = TEAL;
+      c.shadowColor = RED;
       c.shadowBlur  = 18;
-      c.fillStyle   = TEAL;
+      c.fillStyle   = RED;
       bar.draw(c);
       c.restore();
     }
   };
 
-  // Threshold line plugin
   const threshPlugin = {
     id: 'threshLine',
     afterDraw(chart) {
       const {ctx: c, chartArea: {left, right}, scales: {y}} = chart;
       const yPx = y.getPixelForValue(0.93);
       c.save();
-      c.strokeStyle = 'rgba(0,245,212,0.35)';
-      c.lineWidth   = 1;
+      c.strokeStyle = 'rgba(255,83,87,0.35)';
+      c.lineWidth = 1;
       c.setLineDash([6, 4]);
-      c.beginPath();
-      c.moveTo(left, yPx);
-      c.lineTo(right, yPx);
-      c.stroke();
-      c.fillStyle = 'rgba(0,245,212,0.55)';
+      c.beginPath(); c.moveTo(left, yPx); c.lineTo(right, yPx); c.stroke();
+      c.fillStyle = 'rgba(255,179,175,0.55)';
       c.font = '10px JetBrains Mono, monospace';
       c.fillText('Adam baseline 0.93', left + 6, yPx - 5);
       c.restore();
@@ -1172,7 +1240,6 @@ Chart.defaults.font.family = 'Inter, sans-serif';
         backgroundColor: colors,
         borderColor: borders,
         borderWidth: 1.5,
-        borderRadius: 8,
         borderSkipped: false,
       }]
     },
@@ -1181,27 +1248,15 @@ Chart.defaults.font.family = 'Inter, sans-serif';
       maintainAspectRatio: false,
       plugins: {
         legend: {display: false},
-        tooltip: {
-          callbacks: {
-            label: ctx => ` Macro F1: ${(ctx.raw * 100).toFixed(0)}%`
-          }
-        }
+        tooltip: { callbacks: { label: ctx => ` Macro F1: ${(ctx.raw * 100).toFixed(0)}%` } }
       },
       scales: {
-        x: {
-          grid: {display: false},
-          ticks: {font: {size: 12}},
-          border: {color: 'transparent'},
-        },
+        x: { grid: {display: false}, ticks: {font: {size: 11}}, border: {color: 'transparent'} },
         y: {
-          min: 0,
-          max: 1.00,
+          min: 0, max: 1.00,
           grid: {color: GRID},
-          ticks: {
-            font: {size: 11, family: 'JetBrains Mono, monospace'},
-            callback: v => (v * 100).toFixed(0) + '%',
-          },
-          title: { display: true, text: 'Macro F1 Score', color: SLATE, font: {size: 12} },
+          ticks: { font: {size: 10, family: 'JetBrains Mono, monospace'}, callback: v => (v * 100).toFixed(0) + '%' },
+          title: { display: true, text: 'Macro F1 Score', color: SLATE, font: {size: 11} },
           border: {color: GRID},
         }
       }
@@ -1210,7 +1265,7 @@ Chart.defaults.font.family = 'Inter, sans-serif';
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Actual results data (from results/logs/ + evaluation_report.txt)
+// Actual results data
 // ─────────────────────────────────────────────────────────────────────────────
 const sgdVF1 = [0.3408,0.4922,0.5851,0.6378,0.6693,0.6959,0.7253,0.7292,0.7632,0.7759,0.7953,0.8007,0.8117,0.806,0.788,0.8234,0.8372,0.8451,0.8265,0.8228,0.8121,0.8359,0.8532,0.849,0.8664,0.8471,0.8606,0.853,0.8525,0.8678,0.8725,0.8712,0.8425,0.8796,0.8782,0.8788,0.8791,0.8714,0.8838,0.8802,0.8836,0.8872,0.8834,0.8831,0.8849,0.8709,0.8924,0.8785,0.8841,0.8824,0.887,0.8924,0.8879,0.8814,0.8885,0.8774,0.8844,0.8787,0.8894,0.8897,0.8888,0.8894];
 const sgdmomVF1 = [0.5584,0.6856,0.7119,0.7932,0.8437,0.8479,0.8781,0.8554,0.8792,0.8799,0.8737,0.9046,0.8926,0.8986,0.9058,0.9113,0.9123,0.9121,0.9101,0.7304,0.8955,0.904,0.9062,0.9164,0.9071,0.9206,0.8631,0.9079,0.9199,0.9169,0.9195,0.9184,0.9217,0.9188,0.9122,0.9205,0.9216,0.9204,0.8852,0.8323,0.9182,0.9153,0.9155,0.9213,0.9213,0.9212,0.9187,0.867];
@@ -1225,7 +1280,7 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
   const ctx = document.getElementById('perClassF1Chart');
   if (!ctx) return;
 
-  const classes  = ['Normal (N)', 'Supraventricular (S)', 'Ventricular (V)', 'Fusion (F)', 'Unknown (Q)'];
+  const classes   = ['Normal (N)', 'Supraventricular (S)', 'Ventricular (V)', 'Fusion (F)', 'Unknown (Q)'];
   const precision = [0.9931, 0.7774, 0.9447, 0.8023, 0.9876];
   const recall    = [0.9879, 0.8417, 0.9675, 0.8519, 0.9907];
   const f1        = [0.9905, 0.8083, 0.9560, 0.8263, 0.9891];
@@ -1235,58 +1290,24 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
     data: {
       labels: classes,
       datasets: [
-        {
-          label: 'Precision',
-          data: precision,
-          backgroundColor: 'rgba(99,179,237,0.55)',
-          borderColor: 'rgba(99,179,237,0.9)',
-          borderWidth: 1,
-          borderRadius: 5,
-        },
-        {
-          label: 'Recall',
-          data: recall,
-          backgroundColor: 'rgba(167,139,250,0.55)',
-          borderColor: 'rgba(167,139,250,0.9)',
-          borderWidth: 1,
-          borderRadius: 5,
-        },
-        {
-          label: 'F1',
-          data: f1,
-          backgroundColor: 'rgba(0,245,212,0.55)',
-          borderColor: TEAL,
-          borderWidth: 1.5,
-          borderRadius: 5,
-        },
+        { label: 'Precision', data: precision, backgroundColor: 'rgba(99,179,237,0.50)', borderColor: 'rgba(99,179,237,0.9)', borderWidth: 1 },
+        { label: 'Recall',    data: recall,    backgroundColor: 'rgba(167,139,250,0.50)', borderColor: 'rgba(167,139,250,0.9)', borderWidth: 1 },
+        { label: 'F1',        data: f1,        backgroundColor: RED20, borderColor: RED, borderWidth: 1.5 },
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: true,
-          labels: {color: SLATE, font: {size: 12}, boxWidth: 14, padding: 16}
-        },
-        tooltip: {
-          callbacks: {label: c => ` ${c.dataset.label}: ${(c.raw * 100).toFixed(2)}%`}
-        }
+        legend: { display: true, labels: {color: SLATE, font: {size: 11}, boxWidth: 12, padding: 14} },
+        tooltip: { callbacks: {label: c => ` ${c.dataset.label}: ${(c.raw * 100).toFixed(2)}%`} }
       },
       scales: {
-        x: {
-          grid: {display: false},
-          ticks: {font: {size: 11}},
-          border: {color: 'transparent'},
-        },
+        x: { grid: {display: false}, ticks: {font: {size: 10}}, border: {color: 'transparent'} },
         y: {
-          min: 0.70,
-          max: 1.00,
+          min: 0.70, max: 1.00,
           grid: {color: GRID},
-          ticks: {
-            font: {size: 11, family: 'JetBrains Mono, monospace'},
-            callback: v => (v * 100).toFixed(0) + '%',
-          },
+          ticks: { font: {size: 10, family: 'JetBrains Mono, monospace'}, callback: v => (v * 100).toFixed(0) + '%' },
           border: {color: GRID},
         }
       }
@@ -1302,8 +1323,6 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
   if (!ctx) return;
 
   const epochs = adamVF1Full.map((_, i) => i + 1);
-
-  // Best val F1 line (running max)
   let runMax = 0;
   const runningBest = adamVF1Full.map(v => { runMax = Math.max(runMax, v); return runMax; });
 
@@ -1315,11 +1334,11 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
         {
           label: 'Val Macro F1',
           data: adamVF1Full,
-          borderColor: TEAL,
+          borderColor: RED,
           borderWidth: 1.5,
           pointRadius: 0,
           tension: 0.2,
-          fill: {target: 'origin', above: TEAL08},
+          fill: {target: 'origin', above: RED08},
         },
         {
           label: 'Best so far',
@@ -1337,19 +1356,18 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {display: true, labels: {color: SLATE, font: {size: 11}, boxWidth: 14, padding: 12}},
+        legend: {display: true, labels: {color: SLATE, font: {size: 10}, boxWidth: 12, padding: 10}},
         tooltip: {mode: 'index', intersect: false, callbacks: {label: c => ` ${c.dataset.label}: ${(c.raw*100).toFixed(1)}%`}}
       },
       scales: {
         x: {
           grid: {color: GRID},
           ticks: {font: {size: 10}, maxTicksLimit: 11},
-          title: {display: true, text: 'Epoch', color: SLATE, font: {size: 11}},
+          title: {display: true, text: 'Epoch', color: SLATE, font: {size: 10}},
           border: {color: GRID},
         },
         y: {
-          min: 0.30,
-          max: 1.00,
+          min: 0.30, max: 1.00,
           grid: {color: GRID},
           ticks: {font: {size: 10, family: 'JetBrains Mono, monospace'}, callback: v => (v*100).toFixed(0)+'%'},
           border: {color: GRID},
@@ -1371,7 +1389,7 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
     {label: 'SGD+Momentum', data: sgdmomVF1,   color: 'rgba(167,139,250,0.85)', dash: []},
     {label: 'Adagrad',      data: adagradVF1,  color: 'rgba(251,191,36,0.75)',  dash: [2,2]},
     {label: 'RMSProp',      data: rmspropVF1,  color: 'rgba(239,68,68,0.65)',   dash: [6,3]},
-    {label: 'Adam',         data: adamVF1Full, color: TEAL,                     dash: []},
+    {label: 'Adam',         data: adamVF1Full, color: RED,                      dash: []},
   ].map(d => ({
     label: d.label,
     data: d.data.map((v, i) => ({x: i+1, y: v})),
@@ -1390,21 +1408,19 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {display: true, labels: {color: SLATE, font: {size: 10}, boxWidth: 14, padding: 10}},
+        legend: {display: true, labels: {color: SLATE, font: {size: 9}, boxWidth: 12, padding: 8}},
         tooltip: {mode: 'index', intersect: false, callbacks: {label: c => ` ${c.dataset.label}: ${(c.parsed.y*100).toFixed(1)}%`}}
       },
       scales: {
         x: {
-          type: 'linear',
-          min: 1,
+          type: 'linear', min: 1,
           grid: {color: GRID},
           ticks: {font: {size: 10}, maxTicksLimit: 11},
-          title: {display: true, text: 'Epoch', color: SLATE, font: {size: 11}},
+          title: {display: true, text: 'Epoch', color: SLATE, font: {size: 10}},
           border: {color: GRID},
         },
         y: {
-          min: 0.30,
-          max: 1.00,
+          min: 0.30, max: 1.00,
           grid: {color: GRID},
           ticks: {font: {size: 10, family: 'JetBrains Mono, monospace'}, callback: v => (v*100).toFixed(0)+'%'},
           border: {color: GRID},
@@ -1415,14 +1431,13 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 9. Actual Optimizer Bar Chart (real best val F1)
+// 9. Actual Optimizer Bar Chart
 // ─────────────────────────────────────────────────────────────────────────────
 (function () {
   const ctx = document.getElementById('actualOptimizerChart');
   if (!ctx) return;
 
   const labels = ['SGD', 'SGD + Momentum', 'Adagrad', 'RMSProp', 'Adam'];
-  // Best val F1 from logs
   const actual = [
     Math.max(...sgdVF1),
     Math.max(...sgdmomVF1),
@@ -1430,31 +1445,30 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
     Math.max(...rmspropVF1),
     Math.max(...adamVF1Full),
   ];
-  const bestIdx = actual.indexOf(Math.max(...actual)); // SGD+M = index 1
+  const bestIdx = actual.indexOf(Math.max(...actual));
 
   const colors = actual.map((_, i) =>
-    i === bestIdx ? 'rgba(167,139,250,0.80)' :
-    i === 4       ? TEAL20 :
-    'rgba(100,116,139,0.55)'
+    i === bestIdx ? 'rgba(167,139,250,0.75)' :
+    i === 4       ? RED20 :
+    'rgba(95,62,61,0.55)'
   );
   const borders = actual.map((_, i) =>
     i === bestIdx ? 'rgba(167,139,250,1)' :
-    i === 4       ? TEAL :
-    'rgba(100,116,139,0.8)'
+    i === 4       ? RED :
+    'rgba(95,62,61,0.8)'
   );
 
   const testF1Line = {
     id: 'testF1Line',
     afterDraw(chart) {
       const {ctx: c, chartArea: {left, right}, scales: {y}} = chart;
-      // Adam test F1 = 0.914
       const yPx = y.getPixelForValue(0.914);
       c.save();
-      c.strokeStyle = 'rgba(0,245,212,0.4)';
+      c.strokeStyle = 'rgba(255,83,87,0.4)';
       c.lineWidth = 1.5;
       c.setLineDash([6, 4]);
       c.beginPath(); c.moveTo(left, yPx); c.lineTo(right, yPx); c.stroke();
-      c.fillStyle = 'rgba(0,245,212,0.6)';
+      c.fillStyle = 'rgba(255,179,175,0.6)';
       c.font = '10px JetBrains Mono, monospace';
       c.fillText('Adam test F1 = 91.4%', left + 6, yPx - 6);
       c.restore();
@@ -1471,7 +1485,6 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
         backgroundColor: colors,
         borderColor: borders,
         borderWidth: 1.5,
-        borderRadius: 8,
         borderSkipped: false,
       }]
     },
@@ -1480,25 +1493,15 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
       maintainAspectRatio: false,
       plugins: {
         legend: {display: false},
-        tooltip: {
-          callbacks: {label: c => ` Best Val F1: ${(c.raw * 100).toFixed(2)}%`}
-        }
+        tooltip: { callbacks: {label: c => ` Best Val F1: ${(c.raw * 100).toFixed(2)}%`} }
       },
       scales: {
-        x: {
-          grid: {display: false},
-          ticks: {font: {size: 12}},
-          border: {color: 'transparent'},
-        },
+        x: { grid: {display: false}, ticks: {font: {size: 11}}, border: {color: 'transparent'} },
         y: {
-          min: 0,
-          max: 1.00,
+          min: 0, max: 1.00,
           grid: {color: GRID},
-          ticks: {
-            font: {size: 11, family: 'JetBrains Mono, monospace'},
-            callback: v => (v * 100).toFixed(0) + '%',
-          },
-          title: {display: true, text: 'Best Val Macro F1', color: SLATE, font: {size: 12}},
+          ticks: { font: {size: 10, family: 'JetBrains Mono, monospace'}, callback: v => (v * 100).toFixed(0) + '%' },
+          title: {display: true, text: 'Best Val Macro F1', color: SLATE, font: {size: 11}},
           border: {color: GRID},
         }
       }
@@ -1514,42 +1517,25 @@ const adamVF1Full = [0.3791,0.5822,0.5935,0.5886,0.5485,0.5881,0.5736,0.6251,0.6
   const lbImg = document.getElementById('lbImg');
   const lbClose = document.getElementById('lbClose');
 
-  function openLb(src) {
-    lbImg.src = src;
-    lb.classList.add('open');
-  }
-  function closeLb() {
-    lb.classList.remove('open');
-    lbImg.src = '';
-  }
+  function openLb(src) { lbImg.src = src; lb.classList.add('open'); }
+  function closeLb()   { lb.classList.remove('open'); lbImg.src = ''; }
 
   lb.addEventListener('click', closeLb);
   lbClose.addEventListener('click', e => { e.stopPropagation(); closeLb(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
 
-  // Run after charts are rendered (next tick after DOMContentLoaded)
   function wireElements() {
-    // 1. Canvas elements — snapshot as PNG on click
     document.querySelectorAll('canvas').forEach(canvas => {
       const wrapper = canvas.parentElement;
-      wrapper.classList.add('chart-expandable');
-      wrapper.addEventListener('click', () => {
-        // Use white background for export clarity; keep dark
-        const dataUrl = canvas.toDataURL('image/png');
-        openLb(dataUrl);
-      });
-    });
-
-    // 2. <img> elements inside result/plot containers
-    document.querySelectorAll('img[src^="/results"]').forEach(img => {
-      const wrapper = img.parentElement;
-      wrapper.classList.add('chart-expandable');
       wrapper.style.cursor = 'zoom-in';
-      wrapper.addEventListener('click', () => openLb(img.src));
+      wrapper.addEventListener('click', () => openLb(canvas.toDataURL('image/png')));
+    });
+    document.querySelectorAll('img[src^="/results"]').forEach(img => {
+      img.parentElement.style.cursor = 'zoom-in';
+      img.parentElement.addEventListener('click', () => openLb(img.src));
     });
   }
 
-  // Charts are initialised synchronously above, so wire on next frame
   requestAnimationFrame(() => requestAnimationFrame(wireElements));
 })();
 </script>

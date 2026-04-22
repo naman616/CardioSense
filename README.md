@@ -201,6 +201,9 @@ Raw CSV (187 values/row)
 ## Running Locally
 
 ```bash
+# Pull model checkpoint and reference waveforms from Git LFS
+git lfs pull
+
 # Install dependencies
 pip install -r requirements.txt
 

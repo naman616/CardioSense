@@ -48,6 +48,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/assets", StaticFiles(directory=str(PROJECT_ROOT / "frontend/assets")), name="assets")
 app.mount("/static", StaticFiles(directory=str(PROJECT_ROOT / "frontend")), name="static")
 app.mount("/results", StaticFiles(directory=str(PROJECT_ROOT / "results")), name="results")
 

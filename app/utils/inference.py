@@ -52,7 +52,7 @@ def load_model(
         device = get_device(verbose=False)
 
     model = ResNet1D()
-    state_dict = torch.load(checkpoint_path, map_location=device, weights_only=True)
+    state_dict = torch.load(checkpoint_path, map_location=device, weights_only=False)
     model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
